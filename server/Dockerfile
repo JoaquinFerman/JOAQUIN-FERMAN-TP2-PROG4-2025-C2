@@ -5,9 +5,8 @@ WORKDIR /app
 # Copia solo el contenido de la carpeta server
 COPY . .
 
-RUN cd server
-RUN npm install
-RUN npm run build
+RUN cd server && npm install
+RUN cd server && npm run build
 
 EXPOSE 3000
 
