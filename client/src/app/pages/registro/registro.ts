@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-registro',
@@ -17,7 +18,8 @@ export class RegistroComponent {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.registroForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -95,23 +97,25 @@ export class RegistroComponent {
     if (this.registroForm.valid) {
       this.isLoading = true;
       const formData = new FormData();
-      
       Object.keys(this.registroForm.value).forEach(key => {
         if (key !== 'confirmPassword') {
           formData.append(key, this.registroForm.value[key]);
         }
       });
-
       if (this.selectedFile) {
         formData.append('imagenPerfil', this.selectedFile);
       }
-
-      console.log('Datos del registro:', this.registroForm.value);
-      setTimeout(() => {
-        this.isLoading = false;
-        alert('Usuario registrado exitosamente');
-        this.router.navigate(['/login']);
-      }, 2000);
+      this.authService.register(formData).subscribe({
+        next: (res) => {
+          this.isLoading = false;
+          alert('Usuario registrado exitosamente');
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          alert(err?.error?.message || 'Error al registrar usuario');
+        }
+      });
     } else {
       this.markFormGroupTouched();
     }

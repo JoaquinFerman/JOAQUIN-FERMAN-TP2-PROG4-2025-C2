@@ -52,8 +52,8 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next: (res) => {
           this.isLoading = false;
-          if (res && res.token) {
-            this.authService.setToken(res.token);
+          if (res && res.access_token) {            
+            this.authService.setToken(res.access_token);
             this.successMsg = '¡Login exitoso!';
             setTimeout(() => {
               this.router.navigate(['/publicaciones']);

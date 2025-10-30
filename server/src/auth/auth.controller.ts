@@ -23,7 +23,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('registro')
+  @Post('register')
   @UseInterceptors(FileInterceptor('imagenPerfil', {
     storage: diskStorage({
       destination: './uploads/perfiles',
