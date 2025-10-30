@@ -2,20 +2,25 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth';
+import { ErrorMessageComponent } from '../../components/error-message/error-message';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ErrorMessageComponent],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class LoginComponent {
   loginForm: FormGroup;
   isLoading = false;
+  errorMsg: string = '';
+  successMsg: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
       emailOrUsername: ['', [Validators.required, Validators.minLength(3)]],
@@ -40,15 +45,28 @@ export class LoginComponent {
   }
 
   onSubmit() {
+    this.errorMsg = '';
+    this.successMsg = '';
     if (this.loginForm.valid) {
       this.isLoading = true;
-      console.log('Datos del login:', this.loginForm.value);
-      // TODO: Conectar con el servicio de autenticación
-      setTimeout(() => {
-        this.isLoading = false;
-        // Redirect to publications after successful login
-        this.router.navigate(['/publicaciones']);
-      }, 2000);
+      this.authService.login(this.loginForm.value).subscribe({
+        next: (res) => {
+          this.isLoading = false;
+          if (res && res.token) {
+            this.authService.setToken(res.token);
+            this.successMsg = '¡Login exitoso!';
+            setTimeout(() => {
+              this.router.navigate(['/publicaciones']);
+            }, 1000);
+          } else {
+            this.errorMsg = 'Respuesta inesperada del servidor.';
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMsg = err?.error?.message || 'Error al iniciar sesión.';
+        }
+      });
     } else {
       this.markFormGroupTouched();
     }

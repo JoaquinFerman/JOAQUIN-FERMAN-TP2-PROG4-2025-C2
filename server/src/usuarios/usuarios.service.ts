@@ -1,4 +1,5 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, Inject } from '@nestjs/common';
+import { AppLogger } from '../logger/logger';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
@@ -10,6 +11,7 @@ import { Usuario, UsuarioDocument } from './entities/usuario.entity';
 export class UsuariosService {
   constructor(
     @InjectModel(Usuario.name) private usuarioModel: Model<UsuarioDocument>,
+    @Inject(AppLogger) private readonly logger: AppLogger,
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
@@ -22,6 +24,7 @@ export class UsuariosService {
       ]
     });
     if (exists) {
+      this.logger.warn(`Intento de registro con email o nombre de usuario duplicado: ${createUsuarioDto.email}, ${createUsuarioDto.nombreUsuario}`);
       throw new ConflictException('El email o nombre de usuario ya está en uso, y ambos deben ser únicos entre sí');
     }
 
@@ -55,7 +58,9 @@ export class UsuariosService {
       fechaNacimiento: new Date(createUsuarioDto.fechaNacimiento),
     });
 
-    return usuario.save();
+  const saved = await usuario.save();
+  this.logger.log(`Usuario creado: ${saved._id} (${saved.email}, ${saved.nombreUsuario})`);
+  return saved;
   }
 
   async findAll(): Promise<Usuario[]> {
@@ -116,9 +121,10 @@ export class UsuariosService {
     ).select('-password').exec();
 
     if (!usuario) {
+      this.logger.error(`Usuario no encontrado: ${id}`);
       throw new NotFoundException('Usuario no encontrado');
     }
-
+    this.logger.log(`Usuario actualizado: ${usuario._id}`);
     return usuario;
   }
 
@@ -130,8 +136,10 @@ export class UsuariosService {
     );
 
     if (!result) {
+      this.logger.error(`Usuario no encontrado para eliminar: ${id}`);
       throw new NotFoundException('Usuario no encontrado');
     }
+    this.logger.log(`Usuario eliminado (desactivado): ${id}`);
   }
 
   async validatePassword(user: Usuario, password: string): Promise<boolean> {
