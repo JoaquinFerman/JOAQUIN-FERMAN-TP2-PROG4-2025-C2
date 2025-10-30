@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IComentario } from '../../pages/publicaciones/publicaciones';
+import { IComment } from '../../pages/publicaciones/publicaciones';
 
 @Component({
   selector: 'app-comentario',
@@ -9,7 +9,7 @@ import { IComentario } from '../../pages/publicaciones/publicaciones';
   styleUrl: './comentario.css'
 })
 export class ComentarioComponent {
-  @Input() comentario!: IComentario;
+  @Input() comentario!: IComment;
 
   formatearFecha(fecha: Date): string {
     const ahora = new Date();

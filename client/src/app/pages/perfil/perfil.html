@@ -34,15 +34,17 @@
             >
             @if (editing) {
               <div class="avatar-edit compact-avatar-edit">
-                <input 
-                  type="file" 
-                  id="avatarFile"
-                  (change)="onFileSelected($event)"
-                  class="file-input"
-                  accept="image/*"
-                >
                 <label for="avatarFile" class="file-input-label">
                   Cambiar foto
+                  <input 
+                    type="file" 
+                    id="avatarFile"
+                    (change)="onFileSelected($event)"
+                    class="file-input"
+                    accept="image/*"
+                    style="opacity:0;position:absolute;left:0;top:0;width:100%;height:100%;cursor:pointer;"
+                    tabindex="-1"
+                  >
                 </label>
               </div>
             }

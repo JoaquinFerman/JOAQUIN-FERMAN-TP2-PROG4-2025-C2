@@ -139,6 +139,12 @@
 }
 
 .file-input-label {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.file-input-label {
   display: block;
   padding: 8px 16px;
   background: #667eea;

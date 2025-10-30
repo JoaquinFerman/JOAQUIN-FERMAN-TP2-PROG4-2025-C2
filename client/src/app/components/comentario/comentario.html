@@ -1,15 +1,15 @@
 <div class="comentario-item">
   <img 
-    [src]="comentario.autor.imagenPerfil || 'https://via.placeholder.com/32'" 
-    [alt]="comentario.autor.nombre"
+    [src]="comentario.author.profileImage" 
+    [alt]="comentario.author.firstName"
     class="comentario-avatar"
   >
   <div class="comentario-content">
     <div class="comentario-header">
-      <strong>{{ comentario.autor.nombre }} {{ comentario.autor.apellido }}</strong>
-      <span class="comentario-username">@{{ comentario.autor.nombreUsuario }}</span>
-      <span class="comentario-fecha">· {{ formatearFecha(comentario.fechaCreacion) }}</span>
+      <strong>{{ comentario.author.firstName }} {{ comentario.author.lastName }}</strong>
+      <span class="comentario-username">@{{ comentario.author.username }}</span>
+      <span class="comentario-fecha">· {{ formatearFecha(comentario.createdAt) }}</span>
     </div>
-    <p class="comentario-mensaje">{{ comentario.mensaje }}</p>
+    <p class="comentario-mensaje">{{ comentario.message }}</p>
   </div>
 </div>
