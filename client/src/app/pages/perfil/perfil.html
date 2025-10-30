@@ -1,1 +1,206 @@
-<p>perfil works!</p>
+<div class="perfil-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Mi Perfil</h1>
+      <nav class="navigation">
+        <a href="/publicaciones" class="nav-link">Publicaciones</a>
+        <a href="/perfil" class="nav-link active">Mi Perfil</a>
+        <a href="/login" class="nav-link logout">Cerrar Sesión</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    <!-- Loading state -->
+    @if (loading) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Cargando perfil...</p>
+      </div>
+    }
+
+    <!-- Profile content -->
+  @if (!loading && user) {
+  <div class="perfil-content">
+        <!-- Profile header -->
+        <div class="perfil-header">
+          <div class="avatar-section">
+            <img 
+              [src]="imagePreview || user.profileImage || 'https://via.placeholder.com/150'" 
+              [alt]="user.firstName + ' ' + user.lastName"
+              class="profile-avatar"
+            >
+            @if (editing) {
+              <div class="avatar-edit compact-avatar-edit">
+                <input 
+                  type="file" 
+                  id="avatarFile"
+                  (change)="onFileSelected($event)"
+                  class="file-input"
+                  accept="image/*"
+                >
+                <label for="avatarFile" class="file-input-label">
+                  Cambiar foto
+                </label>
+              </div>
+            }
+          </div>
+          <div class="profile-info">
+            @if (!editing) {
+              <div class="info-display">
+                <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+                <p class="username">@{{ user.username }}</p>
+                <p class="description">{{ user.description || 'Sin descripción' }}</p>
+                <div class="metadata">
+                  <span class="badge" [class.admin]="user.role === 'admin'">
+                    {{ user.role === 'admin' ? 'Administrador' : 'Usuario' }}
+                  </span>
+                  <span class="join-date">Miembro desde {{ formatDate(user.registrationDate) }}</span>
+                </div>
+              </div>
+              <div class="profile-actions">
+                <button (click)="toggleEdit()" class="btn-primary">
+                  Editar Perfil
+                </button>
+              </div>
+            }
+            @if (editing) {
+              <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="edit-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="firstName">Nombre *</label>
+                    <input 
+                      type="text" 
+                      id="firstName"
+                      formControlName="firstName"
+                      class="form-control"
+                      [class.error]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched"
+                    >
+                    @if (getFieldError('firstName')) {
+                      <div class="error-message">
+                        {{ getFieldError('firstName') }}
+                      </div>
+                    }
+                  </div>
+                  <div class="form-group">
+                    <label for="lastName">Apellido *</label>
+                    <input 
+                      type="text" 
+                      id="lastName"
+                      formControlName="lastName"
+                      class="form-control"
+                      [class.error]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched"
+                    >
+                    @if (getFieldError('lastName')) {
+                      <div class="error-message">
+                        {{ getFieldError('lastName') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="email">Email *</label>
+                  <input 
+                    type="email" 
+                    id="email"
+                    formControlName="email"
+                    class="form-control"
+                    [class.error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+                  >
+                  @if (getFieldError('email')) {
+                    <div class="error-message">
+                      {{ getFieldError('email') }}
+                    </div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label for="username">Nombre de Usuario *</label>
+                  <input 
+                    type="text" 
+                    id="username"
+                    formControlName="username"
+                    class="form-control"
+                    [class.error]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched"
+                  >
+                  @if (getFieldError('username')) {
+                    <div class="error-message">
+                      {{ getFieldError('username') }}
+                    </div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label for="birthDate">Fecha de Nacimiento *</label>
+                  <input 
+                    type="date" 
+                    id="birthDate"
+                    formControlName="birthDate"
+                    class="form-control"
+                    [class.error]="profileForm.get('birthDate')?.invalid && profileForm.get('birthDate')?.touched"
+                  >
+                  @if (getFieldError('birthDate')) {
+                    <div class="error-message">
+                      {{ getFieldError('birthDate') }}
+                    </div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label for="description">Descripción</label>
+                  <textarea 
+                    id="description"
+                    formControlName="description"
+                    class="form-control textarea"
+                    [class.error]="profileForm.get('description')?.invalid && profileForm.get('description')?.touched"
+                    placeholder="Cuéntanos un poco sobre ti..."
+                    rows="3"
+                  ></textarea>
+                  @if (getFieldError('description')) {
+                    <div class="error-message">
+                      {{ getFieldError('description') }}
+                    </div>
+                  }
+                </div>
+                <div class="form-actions">
+                  <button 
+                    type="button" 
+                    (click)="toggleEdit()"
+                    class="btn-secondary"
+                    [disabled]="saving"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    type="submit" 
+                    class="btn-primary"
+                    [disabled]="saving || profileForm.invalid"
+                  >
+                    @if (saving) {
+                      <span>Guardando...</span>
+                    } @else {
+                      <span>Guardar Cambios</span>
+                    }
+                  </button>
+                </div>
+              </form>
+            }
+          </div>
+        </div>
+        <!-- Profile stats or additional info -->
+        <div class="profile-stats">
+          <div class="stat-card">
+            <h3>Email</h3>
+            <p>{{ user.email }}</p>
+          </div>
+          <div class="stat-card">
+            <h3>Fecha de Nacimiento</h3>
+            <p>{{ user.birthDate | date:'dd/MM/yyyy' }}</p>
+          </div>
+          <div class="stat-card">
+            <h3>Tipo de Cuenta</h3>
+            <p>{{ user.role === 'admin' ? 'Administrador' : 'Usuario Regular' }}</p>
+          </div>
+        </div>
+      </div>
+    }
+</div>

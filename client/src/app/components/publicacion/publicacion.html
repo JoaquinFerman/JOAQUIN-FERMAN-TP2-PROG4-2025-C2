@@ -1,1 +1,104 @@
-<p>publicacion works!</p>
+<div class="publicacion-card">
+  <!-- Header de la publicación -->
+  <div class="publicacion-header">
+    <div class="autor-info">
+      <img 
+        [src]="post.author.profileImage || 'https://via.placeholder.com/40'" 
+        [alt]="post.author.firstName + ' ' + post.author.lastName"
+        class="avatar"
+      >
+      <div class="autor-details">
+        <h4>{{ post.author.firstName }} {{ post.author.lastName }}</h4>
+        <span class="username">@{{ post.author.username }}</span>
+        <span class="fecha">· {{ formatDate(post.createdAt) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido de la publicación -->
+  <div class="publicacion-content">
+    <h3 class="titulo">{{ post.title }}</h3>
+    <p class="mensaje">{{ post.message }}</p>
+    @if (post.image) {
+      <img 
+        [src]="post.image" 
+        [alt]="post.title"
+        class="imagen-publicacion"
+      >
+    }
+  </div>
+
+  <!-- Acciones de la publicación -->
+  <div class="publicacion-actions">
+    <button 
+      class="action-btn like-btn"
+      [class.liked]="post.likedByUser"
+      (click)="toggleLike()"
+    >
+      <span class="icon">{{ post.likedByUser ? '❤️' : '🤍' }}</span>
+      <span class="count">{{ post.likes }}</span>
+    </button>
+
+    <button 
+      class="action-btn comment-btn"
+      (click)="toggleComments()"
+    >
+      <span class="icon">💬</span>
+      <span class="count">{{ post.comments.length }}</span>
+    </button>
+  </div>
+
+  <!-- Sección de comentarios -->
+  @if (showComments) {
+    <div class="comentarios-section">
+    <!-- Lista de comentarios existentes -->
+    @if (post.comments.length > 0) {
+      <div class="comentarios-lista">
+        @for (comment of post.comments; track comment.id) {
+          <div class="comentario-item">
+            <img 
+              [src]="comment.author.profileImage || 'https://via.placeholder.com/32'" 
+              [alt]="comment.author.firstName"
+              class="comentario-avatar"
+            >
+            <div class="comentario-content">
+              <div class="comentario-header">
+                <strong>{{ comment.author.firstName }} {{ comment.author.lastName }}</strong>
+                <span class="comentario-username">@{{ comment.author.username }}</span>
+                <span class="comentario-fecha">· {{ formatDate(comment.createdAt) }}</span>
+              </div>
+              <p class="comentario-mensaje">{{ comment.message }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Formulario para nuevo comentario -->
+    <div class="nuevo-comentario">
+      <div class="comentario-form">
+        <img 
+          src="https://picsum.photos/100/100?random=200" 
+          alt="Tu avatar"
+          class="comentario-avatar"
+        >
+        <div class="form-input-group">
+          <textarea 
+            [(ngModel)]="newComment"
+            placeholder="Escribe un comentario..."
+            class="comentario-input"
+            rows="2"
+          ></textarea>
+          <button 
+            (click)="addComment()"
+            class="btn-comentar"
+            [disabled]="!newComment.trim()"
+          >
+            Comentar
+          </button>
+        </div>
+      </div>
+    </div>
+    </div>
+  }
+</div>

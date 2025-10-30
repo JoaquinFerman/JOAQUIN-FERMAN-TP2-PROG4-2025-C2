@@ -1,0 +1,219 @@
+.publicacion-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.publicacion-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.publicacion-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.autor-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.autor-details h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.username, .fecha {
+  font-size: 14px;
+  color: #666;
+}
+
+.publicacion-content {
+  padding: 20px;
+}
+
+.titulo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.mensaje {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #444;
+  margin: 0 0 16px 0;
+}
+
+.imagen-publicacion {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.publicacion-actions {
+  display: flex;
+  gap: 20px;
+  padding: 16px 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  color: #666;
+}
+
+.action-btn:hover {
+  background-color: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.like-btn.liked {
+  color: #e74c3c;
+}
+
+.like-btn.liked:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+.icon {
+  font-size: 18px;
+}
+
+.count {
+  font-weight: 500;
+}
+
+.comentarios-section {
+  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.comentarios-lista {
+  padding: 16px 20px;
+}
+
+.comentario-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.comentario-item:last-child {
+  margin-bottom: 0;
+}
+
+.comentario-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.comentario-content {
+  flex: 1;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.comentario-header {
+  margin-bottom: 4px;
+}
+
+.comentario-header strong {
+  font-size: 14px;
+  color: #333;
+}
+
+.comentario-username, .comentario-fecha {
+  font-size: 12px;
+  color: #666;
+}
+
+.comentario-mensaje {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #444;
+  margin: 0;
+}
+
+.nuevo-comentario {
+  padding: 16px 20px;
+  border-top: 1px solid #eee;
+}
+
+.comentario-form {
+  display: flex;
+  gap: 12px;
+}
+
+.form-input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comentario-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.comentario-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.btn-comentar {
+  align-self: flex-end;
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-comentar:hover:not(:disabled) {
+  background: #5a67d8;
+}
+
+.btn-comentar:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}

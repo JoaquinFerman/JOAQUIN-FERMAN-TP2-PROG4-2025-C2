@@ -1,1 +1,190 @@
-<p>registro works!</p>
+<div class="registro-container">
+  <div class="registro-card">
+    <div class="registro-header">
+      <h1>Crear Cuenta</h1>
+      <p>Únete a nuestra comunidad</p>
+    </div>
+    
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" class="registro-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nombre">Nombre *</label>
+          <input 
+            type="text" 
+            id="nombre"
+            formControlName="nombre"
+            class="form-control"
+            [class.error]="registroForm.get('nombre')?.invalid && registroForm.get('nombre')?.touched"
+            placeholder="Tu nombre"
+          >
+          @if (getFieldError('nombre')) {
+            <div class="error-message">
+              {{ getFieldError('nombre') }}
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="apellido">Apellido *</label>
+          <input 
+            type="text" 
+            id="apellido"
+            formControlName="apellido"
+            class="form-control"
+            [class.error]="registroForm.get('apellido')?.invalid && registroForm.get('apellido')?.touched"
+            placeholder="Tu apellido"
+          >
+          @if (getFieldError('apellido')) {
+            <div class="error-message">
+              {{ getFieldError('apellido') }}
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input 
+          type="email" 
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.error]="registroForm.get('email')?.invalid && registroForm.get('email')?.touched"
+          placeholder="tu@email.com"
+        >
+        @if (getFieldError('email')) {
+          <div class="error-message">
+            {{ getFieldError('email') }}
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="nombreUsuario">Nombre de Usuario *</label>
+        <input 
+          type="text" 
+          id="nombreUsuario"
+          formControlName="nombreUsuario"
+          class="form-control"
+          [class.error]="registroForm.get('nombreUsuario')?.invalid && registroForm.get('nombreUsuario')?.touched"
+          placeholder="nombre_usuario"
+        >
+        @if (getFieldError('nombreUsuario')) {
+          <div class="error-message">
+            {{ getFieldError('nombreUsuario') }}
+          </div>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Contraseña *</label>
+          <input 
+            type="password" 
+            id="password"
+            formControlName="password"
+            class="form-control"
+            [class.error]="registroForm.get('password')?.invalid && registroForm.get('password')?.touched"
+            placeholder="Contraseña segura"
+          >
+          @if (getFieldError('password')) {
+            <div class="error-message">
+              {{ getFieldError('password') }}
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmar Contraseña *</label>
+          <input 
+            type="password" 
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            class="form-control"
+            [class.error]="(registroForm.get('confirmPassword')?.invalid && registroForm.get('confirmPassword')?.touched) || (registroForm.errors?.['passwordMismatch'] && registroForm.get('confirmPassword')?.touched)"
+            placeholder="Repite la contraseña"
+          >
+          @if (getFieldError('confirmPassword')) {
+            <div class="error-message">
+              {{ getFieldError('confirmPassword') }}
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaNacimiento">Fecha de Nacimiento *</label>
+        <input 
+          type="date" 
+          id="fechaNacimiento"
+          formControlName="fechaNacimiento"
+          class="form-control"
+          [class.error]="registroForm.get('fechaNacimiento')?.invalid && registroForm.get('fechaNacimiento')?.touched"
+        >
+        @if (getFieldError('fechaNacimiento')) {
+          <div class="error-message">
+            {{ getFieldError('fechaNacimiento') }}
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="descripcion">Descripción Breve</label>
+        <textarea 
+          id="descripcion"
+          formControlName="descripcion"
+          class="form-control textarea"
+          [class.error]="registroForm.get('descripcion')?.invalid && registroForm.get('descripcion')?.touched"
+          placeholder="Cuéntanos un poco sobre ti... (opcional)"
+          rows="3"
+        ></textarea>
+        @if (getFieldError('descripcion')) {
+          <div class="error-message">
+            {{ getFieldError('descripcion') }}
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="imagenPerfil">Imagen de Perfil</label>
+        <div class="file-input-wrapper">
+          <input 
+            type="file" 
+            id="imagenPerfil"
+            (change)="onFileSelected($event)"
+            class="file-input"
+            accept="image/*"
+          >
+          <label for="imagenPerfil" class="file-input-label">
+            @if (!selectedFile) {
+              <span>Seleccionar imagen</span>
+            } @else {
+              <span>{{ selectedFile.name }}</span>
+            }
+          </label>
+        </div>
+        @if (imagePreview) {
+          <div class="image-preview">
+            <img [src]="imagePreview" alt="Vista previa">
+          </div>
+        }
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn-primary"
+        [disabled]="isLoading"
+      >
+        @if (isLoading) {
+          <span>Registrando...</span>
+        } @else {
+          <span>Crear Cuenta</span>
+        }
+      </button>
+    </form>
+
+    <div class="registro-footer">
+      <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión aquí</a></p>
+    </div>
+  </div>
+</div>

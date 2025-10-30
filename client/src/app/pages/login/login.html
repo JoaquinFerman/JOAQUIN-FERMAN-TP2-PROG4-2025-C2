@@ -1,1 +1,60 @@
-<p>login works!</p>
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Iniciar Sesión</h1>
+      <p>Bienvenido de vuelta a nuestra red social</p>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="emailOrUsername">Email o Nombre de Usuario</label>
+        <input 
+          type="text" 
+          id="emailOrUsername"
+          formControlName="emailOrUsername"
+          class="form-control"
+          [class.error]="loginForm.get('emailOrUsername')?.invalid && loginForm.get('emailOrUsername')?.touched"
+          placeholder="Ingresa tu email o nombre de usuario"
+        >
+        @if (getFieldError('emailOrUsername')) {
+          <div class="error-message">
+            {{ getFieldError('emailOrUsername') }}
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input 
+          type="password" 
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          placeholder="Ingresa tu contraseña"
+        >
+        @if (getFieldError('password')) {
+          <div class="error-message">
+            {{ getFieldError('password') }}
+          </div>
+        }
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn-primary"
+        [disabled]="isLoading"
+      >
+        @if (isLoading) {
+          <span>Iniciando sesión...</span>
+        } @else {
+          <span>Iniciar Sesión</span>
+        }
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>¿No tienes cuenta? <a href="/registro">Regístrate aquí</a></p>
+    </div>
+  </div>
+</div>
