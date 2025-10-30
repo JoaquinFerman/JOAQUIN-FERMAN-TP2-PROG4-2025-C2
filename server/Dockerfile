@@ -2,17 +2,13 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copia solo los archivos del backend
+# Copia solo el contenido de la carpeta server
 COPY . .
 
-# Instala dependencias
+RUN cd server
 RUN npm install
-
-# Compila el proyecto NestJS
 RUN npm run build
 
-# Expone el puerto NestJS (por defecto 3000)
 EXPOSE 3000
 
-# Comando para iniciar el backend
 CMD ["npm", "run", "start:prod"]
