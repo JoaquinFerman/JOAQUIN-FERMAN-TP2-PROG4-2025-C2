@@ -2,11 +2,11 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copia solo el contenido de la carpeta server
+# Copia todo el contenido de la carpeta server al contenedor
 COPY . .
 
-RUN cd server && npm install
-RUN cd server && npm run build
+RUN npm install
+RUN npm run build
 
 EXPOSE 3000
 
