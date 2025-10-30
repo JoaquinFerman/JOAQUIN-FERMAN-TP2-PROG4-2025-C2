@@ -96,20 +96,17 @@ export class RegistroComponent {
       this.isLoading = true;
       const formData = new FormData();
       
-      // Agregar todos los campos del formulario
       Object.keys(this.registroForm.value).forEach(key => {
         if (key !== 'confirmPassword') {
           formData.append(key, this.registroForm.value[key]);
         }
       });
 
-      // Agregar la imagen si existe
       if (this.selectedFile) {
         formData.append('imagenPerfil', this.selectedFile);
       }
 
       console.log('Datos del registro:', this.registroForm.value);
-      // TODO: Conectar con el servicio de registro
       setTimeout(() => {
         this.isLoading = false;
         alert('Usuario registrado exitosamente');

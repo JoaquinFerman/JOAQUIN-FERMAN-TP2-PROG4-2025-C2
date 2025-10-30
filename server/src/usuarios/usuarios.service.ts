@@ -13,23 +13,18 @@ export class UsuariosService {
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
-    // Verificar si el email ya existe
-    const existingEmail = await this.usuarioModel.findOne({ 
-      email: createUsuarioDto.email 
+    const exists = await this.usuarioModel.findOne({
+      $or: [
+        { email: createUsuarioDto.email },
+        { nombreUsuario: createUsuarioDto.email },
+        { email: createUsuarioDto.nombreUsuario },
+        { nombreUsuario: createUsuarioDto.nombreUsuario }
+      ]
     });
-    if (existingEmail) {
-      throw new ConflictException('El email ya está registrado');
+    if (exists) {
+      throw new ConflictException('El email o nombre de usuario ya está en uso, y ambos deben ser únicos entre sí');
     }
 
-    // Verificar si el nombre de usuario ya existe
-    const existingUsername = await this.usuarioModel.findOne({ 
-      nombreUsuario: createUsuarioDto.nombreUsuario 
-    });
-    if (existingUsername) {
-      throw new ConflictException('El nombre de usuario ya está en uso');
-    }
-
-    // Validar edad mínima (13 años)
     const birthDate = new Date(createUsuarioDto.fechaNacimiento);
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
@@ -44,7 +39,6 @@ export class UsuariosService {
       throw new ConflictException('Debes ser mayor de 13 años para registrarte');
     }
 
-    // Validar contraseña
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(createUsuarioDto.password)) {
       throw new ConflictException('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número');
@@ -91,25 +85,22 @@ export class UsuariosService {
   }
 
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto): Promise<Usuario> {
-    // Verificar si el email ya existe (si se está actualizando)
+    const orConditions: Array<{ email?: string; nombreUsuario?: string }> = [];
     if (updateUsuarioDto.email) {
-      const existingEmail = await this.usuarioModel.findOne({ 
-        email: updateUsuarioDto.email,
-        _id: { $ne: id }
-      });
-      if (existingEmail) {
-        throw new ConflictException('El email ya está registrado');
-      }
+      orConditions.push({ email: updateUsuarioDto.email });
+      orConditions.push({ nombreUsuario: updateUsuarioDto.email });
     }
-
-    // Verificar si el nombre de usuario ya existe (si se está actualizando)
     if (updateUsuarioDto.nombreUsuario) {
-      const existingUsername = await this.usuarioModel.findOne({ 
-        nombreUsuario: updateUsuarioDto.nombreUsuario,
+      orConditions.push({ email: updateUsuarioDto.nombreUsuario });
+      orConditions.push({ nombreUsuario: updateUsuarioDto.nombreUsuario });
+    }
+    if (orConditions.length > 0) {
+      const exists = await this.usuarioModel.findOne({
+        $or: orConditions,
         _id: { $ne: id }
       });
-      if (existingUsername) {
-        throw new ConflictException('El nombre de usuario ya está en uso');
+      if (exists) {
+        throw new ConflictException('El email o nombre de usuario ya está en uso, y ambos deben ser únicos entre sí');
       }
     }
 
