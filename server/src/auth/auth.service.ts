@@ -11,6 +11,7 @@ export interface JwtPayload {
   email: string;
   nombreUsuario: string;
   perfil: string;
+  imagenPerfil?: string;
 }
 
 @Injectable()
@@ -85,6 +86,7 @@ export class AuthService {
       email: usuario.email,
       nombreUsuario: usuario.nombreUsuario,
       perfil: usuario.perfil,
+      imagenPerfil: usuario.imagenPerfil,
     };
         
     return {

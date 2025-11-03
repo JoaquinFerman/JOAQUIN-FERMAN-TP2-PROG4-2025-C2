@@ -7,6 +7,7 @@ import { AppLogger } from './logger/logger';
 import { PublicacionesModule } from './publicaciones/publicaciones.module';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
+import { SupabaseModule } from './supabase/supabase.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     ),
     PublicacionesModule,
     AuthModule,
-    UsuariosModule
+    UsuariosModule,
+    SupabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppLogger],

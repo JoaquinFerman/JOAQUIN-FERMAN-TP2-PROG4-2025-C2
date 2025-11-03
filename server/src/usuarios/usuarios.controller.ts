@@ -21,17 +21,19 @@ export class UsuariosController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usuariosService.findOne((+id).toString());
+    return this.usuariosService.findOne(id);
   }
 
   @Patch(':id')
   @UsePipes(LowercasePipe)
   update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuariosService.update((+id).toString(), updateUsuarioDto);
+    console.log('PATCH /usuarios/:id - ID:', id);
+    console.log('PATCH /usuarios/:id - Body:', updateUsuarioDto);
+    return this.usuariosService.update(id, updateUsuarioDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usuariosService.remove((+id).toString());
+    return this.usuariosService.remove(id);
   }
 }

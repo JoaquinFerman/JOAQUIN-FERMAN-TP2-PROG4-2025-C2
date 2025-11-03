@@ -1,0 +1,8 @@
+<div class="comentario">
+  @if (data.userPhoto) {
+    <img [src]="data.userPhoto" alt="Foto de usuario" class="foto-usuario">
+  }
+  <span class="usuario-nombre">{{data.userName}}</span>
+  <span class="fecha">{{data.date | date:'short'}}</span>
+  <p class="contenido">{{data.content}}</p>
+</div>

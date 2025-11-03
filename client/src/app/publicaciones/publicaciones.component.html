@@ -1,0 +1,30 @@
+
+<div class="publicaciones-container">
+  <div class="perfil-acceso" style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+    @if (usuario) {
+      <button class="btn-perfil" style="background: #764ba2; color: #fff; border-radius: 20px; padding: 0.5rem 1.2rem; font-weight: 500; border: none; cursor: pointer;" (click)="mostrarPerfil = !mostrarPerfil">Mi perfil</button>
+    }
+  </div>
+  @if (mostrarPerfil && usuario) {
+    <div class="modal-overlay" (click)="mostrarPerfil = false"></div>
+    <app-mi-perfil [usuario]="usuario" [publicaciones]="publicaciones" (cerrarPerfil)="mostrarPerfil = false"></app-mi-perfil>
+  }
+  <form class="form-publicar" (submit)="onCrearPublicacion($event)" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+    <input type="text" name="content" placeholder="¿Qué quieres publicar?" style="flex:1; padding:0.5rem; border-radius:8px; border:1px solid #ccc;" required>
+    <button type="submit" style="background: #667eea; color: #fff; border-radius: 8px; padding: 0.5rem 1.2rem; font-weight: 500; border: none; cursor: pointer;">Publicar</button>
+  </form>
+  <div class="ordenamiento">
+    <button (click)="cambiarOrden('fecha')" [class.active]="orden === 'fecha'">Por fecha</button>
+    <button (click)="cambiarOrden('meGusta')" [class.active]="orden === 'meGusta'">Por me gusta</button>
+  </div>
+  <div class="listado-publicaciones">
+    @for (publicacion of publicaciones; track publicacion) {
+      <app-publicacion [data]="publicacion"></app-publicacion>
+    }
+  </div>
+  <div class="paginacion">
+    <button (click)="cambiarPagina(paginaActual - 1)" [disabled]="paginaActual === 1">Anterior</button>
+    <span>Página {{paginaActual}} de {{totalPaginas}}</span>
+    <button (click)="cambiarPagina(paginaActual + 1)" [disabled]="paginaActual === totalPaginas">Siguiente</button>
+  </div>
+</div>

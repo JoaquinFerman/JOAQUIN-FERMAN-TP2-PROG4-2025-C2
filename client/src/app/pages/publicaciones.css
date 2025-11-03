@@ -1,0 +1,77 @@
+.publicaciones-bg {
+	min-height: 100vh;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	padding: 20px;
+	font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+}
+
+.publicaciones-bg {
+	min-height: 100vh;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	padding: 20px;
+	font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+}
+
+.modal-perfil {
+	position: fixed;
+	top: 1.5rem;
+	right: 1.5rem;
+	z-index: 2000;
+	box-shadow: 0 8px 32px rgba(102,126,234,0.18);
+	border: 1px solid #e1e5e9;
+}
+
+.publicaciones-container {
+	background: white;
+	border-radius: 12px;
+	padding: 40px;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+	max-width: 700px;
+	width: 100%;
+	margin: 40px auto;
+}
+
+.ordenamiento {
+	display: flex;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+.ordenamiento button {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 8px 16px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background 0.3s;
+}
+.ordenamiento button.active {
+	box-shadow: 0 0 0 2px #764ba2;
+}
+
+.listado-publicaciones {
+	margin-bottom: 2rem;
+}
+
+.paginacion {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1rem;
+}
+.paginacion button {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 8px 16px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background 0.3s;
+}
+.paginacion button:disabled {
+	background: #e1e5e9;
+	color: #888;
+	cursor: not-allowed;
+}

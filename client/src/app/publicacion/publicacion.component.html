@@ -1,0 +1,35 @@
+@if (!data.deleted) {
+  <div class="publicacion">
+    <div class="publicacion-header">
+      @if (data.userPhoto) {
+        <img [src]="data.userPhoto" alt="Foto de usuario" class="foto-usuario">
+      }
+      <span class="usuario-nombre">{{data.userName}}</span>
+      <span class="fecha">{{data.date | date:'short'}}</span>
+      @if (data.isOwn) {
+        <button (click)="deletePost()">Eliminar</button>
+      }
+    </div>
+    <div class="publicacion-contenido">
+      <p>{{data.content}}</p>
+    </div>
+    <div class="publicacion-footer">
+      @if (!data.liked) {
+        <button (click)="like()">Me gusta</button>
+      }
+      @if (data.liked) {
+        <button (click)="unlike()">Quitar me gusta</button>
+      }
+      <span>{{data.likesCount}} me gusta</span>
+    </div>
+    <div class="comentarios">
+      @for (comment of data.comments; track comment) {
+        <app-comentario [data]="comment"></app-comentario>
+      }
+      <form (submit)="onAddComment($event, commentInput)">
+        <input #commentInput type="text" name="content" placeholder="Agregar comentario..." required>
+        <button type="submit">Comentar</button>
+      </form>
+    </div>
+  </div>
+}

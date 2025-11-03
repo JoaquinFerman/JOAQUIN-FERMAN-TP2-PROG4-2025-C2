@@ -96,3 +96,88 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+## MongoDB Atlas setup (project-specific notes)
+
+This project reads the MongoDB connection URI from the environment variable `MONGODB_URI` via `ConfigModule.forRoot()`.
+
+Quick checklist to connect to Atlas:
+
+- Create a Cluster on MongoDB Atlas (free tier is fine for development).
+- Create a database user (Database Access) and note the username/password.
+- Add your current IP to Network Access (or use 0.0.0.0/0 only for quick testing).
+- Copy the "Connection String (SRV)" from Atlas and replace `<username>`, `<password>` and `<dbname>`.
+- Store the URI in `server/.env` as `MONGODB_URI="mongodb+srv://..."` (do NOT commit `.env` to Git).
+
+Example `.env` entry (already provided as `.env.example`):
+
+MONGODB_URI="mongodb+srv://<username>:<password>@cluster0.abcdef.mongodb.net/redsocial?retryWrites=true&w=majority"
+
+Test connection locally with `mongosh`:
+
+```bash
+mongosh "mongodb+srv://<username>:<password>@cluster0.abcdef.mongodb.net/redsocial"
+use redsocial
+db.usuarios.findOne()
+db.usuarios.getIndexes()
+```
+
+If you need to migrate local data to Atlas, use `mongodump`/`mongorestore`:
+
+```bash
+# create a dump from local
+mongodump --uri="mongodb://localhost:27017/redsocial" --archive=redsocial.archive.gz --gzip
+
+# restore into Atlas
+mongorestore --uri="${MONGODB_URI}" --archive=redsocial.archive.gz --gzip --nsFrom="redsocial.*" --nsTo="redsocial.*"
+```
+
+## Supabase storage setup (profile and publication images)
+
+This project uses Supabase Storage to store user profile images (bucket `usuarios`) and publication images (bucket `publicaciones`). The server expects two environment variables set before start:
+
+- `SUPABASE_URL` — your Supabase project URL (e.g. `https://abcd1234.supabase.co`)
+- `SUPABASE_KEY` — a Supabase API key (use the service_role key for server-side uploads or a restricted key if you prefer)
+
+Note: do NOT attempt to wire Supabase Auth as your application's main authentication in this project. Auth here is handled with your JWT/NestJS pipeline. The Supabase client is used only for Storage (file uploads). On the server you should use a server-side key (service_role) and avoid client-side auth/session code.
+
+Add them to your `server/.env` (or your environment) like this:
+
+```bash
+# Example (DO NOT COMMIT):
+SUPABASE_URL="https://your-project-ref.supabase.co"
+SUPABASE_KEY="your-service-or-anon-key"
+```
+
+Create the storage buckets in the Supabase dashboard:
+
+- Bucket name: `usuarios` — used for profile images.
+- Bucket name: `publicaciones` — used for publication images.
+
+Permissions: For quick testing you can make the buckets public (or enable public access for uploaded objects). For production, prefer private buckets and generate signed URLs when serving images.
+
+Endpoints the server exposes (after adding the env vars and starting the server):
+
+- `POST /auth/upload-image` — form-data `file` field; uploads to `usuarios` and returns `{ imagenUrl, filename }`.
+- `POST /publicaciones/:id/upload-image` — form-data `file` field; uploads to `publicaciones/:id/<filename>` and returns `{ imagenUrl, filename }`.
+
+After adding the environment variables, restart the server from the `server/` folder:
+
+```bash
+cd /home/lockdown/Desktop/UTN/Progra_4/tp_integrador2/server
+npm run start
+```
+
+
+After creating `server/.env`, restart the backend from the `server` folder:
+
+```bash
+cd /home/lockdown/Desktop/UTN/Progra_4/tp_integrador2/server
+npm run start
+```
+
+Security notes:
+- Never commit `.env` to git. Use `.env.example` as a template.
+- Use IP whitelist and least-privilege DB users in production.
+- Consider rotating credentials if shared publicly.
+

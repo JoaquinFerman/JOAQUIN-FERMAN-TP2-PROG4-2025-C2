@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-registro',
@@ -19,7 +20,8 @@ export class RegistroComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {
     this.registroForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -87,7 +89,7 @@ export class RegistroComponent {
         };
         reader.readAsDataURL(file);
       } else {
-        alert('Por favor selecciona una imagen válida (JPG, PNG, GIF)');
+        this.notificationService.error('Por favor selecciona una imagen válida (JPG, PNG, GIF)');
         event.target.value = '';
       }
     }
@@ -108,12 +110,12 @@ export class RegistroComponent {
       this.authService.register(formData).subscribe({
         next: (res) => {
           this.isLoading = false;
-          alert('Usuario registrado exitosamente');
-          this.router.navigate(['/login']);
+          this.notificationService.success('Usuario registrado exitosamente');
+          setTimeout(() => this.router.navigate(['/login']), 1500);
         },
         error: (err) => {
           this.isLoading = false;
-          alert(err?.error?.message || 'Error al registrar usuario');
+          this.notificationService.error(err?.error?.message || 'Error al registrar usuario');
         }
       });
     } else {

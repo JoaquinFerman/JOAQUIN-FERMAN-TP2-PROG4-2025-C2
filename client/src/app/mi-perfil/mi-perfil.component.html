@@ -1,0 +1,116 @@
+@if (usuario) {
+  <div class="modal-perfil">
+    <button class="btn-cerrar" (click)="cerrar()">✕</button>
+    
+    <div class="perfil-container">
+      <!-- Sección de foto e info básica -->
+      <div class="perfil-header">
+        <div class="foto-container">
+          @if (editMode && previewUrl) {
+            <img [src]="previewUrl" alt="Vista previa" class="foto-perfil">
+          } @else if (usuario.foto || usuario.imagenPerfil) {
+            <img [src]="usuario.foto || usuario.imagenPerfil" alt="Foto de perfil" class="foto-perfil">
+          } @else {
+            <div class="foto-placeholder">
+              <span>{{ (usuario.nombre || usuario.username || 'U')[0].toUpperCase() }}</span>
+            </div>
+          }
+          
+          @if (editMode) {
+            <label class="btn-cambiar-foto">
+              📷 Cambiar foto
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+            </label>
+          }
+        </div>
+        
+        @if (!editMode) {
+          <div class="info-principal">
+            <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+            <p class="username">@{{ usuario.username }}</p>
+            <p class="perfil-tipo">{{ usuario.perfil || 'Usuario' }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Formulario de edición o vista de datos -->
+      @if (!editMode) {
+        <div class="datos-detalle">
+          <div class="dato-item">
+            <label>Email</label>
+            <span>{{ usuario.email }}</span>
+          </div>
+          <div class="dato-item">
+            <label>Nombre de usuario</label>
+            <span>{{ usuario.username }}</span>
+          </div>
+          <div class="dato-item">
+            <label>Nombre</label>
+            <span>{{ usuario.nombre }}</span>
+          </div>
+          <div class="dato-item">
+            <label>Apellido</label>
+            <span>{{ usuario.apellido || 'No especificado' }}</span>
+          </div>
+          <div class="dato-item">
+            <label>Tipo de perfil</label>
+            <span>{{ usuario.perfil || 'Usuario' }}</span>
+          </div>
+          @if (usuario.fechaRegistro) {
+            <div class="dato-item">
+              <label>Miembro desde</label>
+              <span>{{ usuario.fechaRegistro | date:'dd/MM/yyyy' }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="acciones">
+          <button class="btn-editar" (click)="editar()">Editar perfil</button>
+          <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
+        </div>
+      } @else {
+        <div class="formulario-edicion">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" [(ngModel)]="usuarioEdit.nombre" placeholder="Nombre">
+          </div>
+          <div class="form-group">
+            <label>Apellido</label>
+            <input type="text" [(ngModel)]="usuarioEdit.apellido" placeholder="Apellido">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="usuarioEdit.email" placeholder="Email">
+          </div>
+          <div class="form-group">
+            <label>Nombre de usuario</label>
+            <input type="text" [(ngModel)]="usuarioEdit.nombreUsuario" placeholder="Username">
+          </div>
+          
+          <div class="acciones-edicion">
+            <button class="btn-cancelar" (click)="cancelarEdicion()">Cancelar</button>
+            <button class="btn-guardar" (click)="guardarEdicion()">Guardar cambios</button>
+          </div>
+        </div>
+      }
+
+      <!-- Publicaciones recientes (compactas) -->
+      @if (!editMode && ultimosTresPosts.length > 0) {
+        <div class="publicaciones-recientes">
+          <h3>Publicaciones recientes</h3>
+          <div class="posts-grid">
+            @for (pub of ultimosTresPosts; track pub._id || pub.id) {
+              <div class="post-mini">
+                <p class="post-content">{{ pub.content }}</p>
+                <div class="post-stats">
+                  <span>❤️ {{ pub.likesCount || 0 }}</span>
+                  <span>💬 {{ pub.comments?.length || 0 }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

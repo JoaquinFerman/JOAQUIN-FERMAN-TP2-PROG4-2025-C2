@@ -1,0 +1,32 @@
+
+.comentario {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: transparent;
+  border-radius: 8px;
+  padding: 0.5rem 0;
+}
+.foto-usuario {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #667eea;
+}
+.usuario-nombre {
+  font-weight: 600;
+  color: #764ba2;
+  margin-right: 0.5rem;
+}
+.fecha {
+  color: #888;
+  font-size: 0.92em;
+  margin-right: 0.5rem;
+}
+.contenido {
+  margin: 0;
+  color: #333;
+  font-size: 1em;
+}
