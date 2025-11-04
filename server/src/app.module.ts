@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { Module, OnModuleInit } from '@nestjs/common';
+import { MongooseModule, InjectConnection } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
-import * as mongoose from 'mongoose';
+import { Connection } from 'mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppLogger } from './logger/logger';
@@ -17,29 +17,9 @@ import { DebugModule } from './debug/debug.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRootAsync({
-      useFactory: async () => {
-        const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/redsocial';
-        console.log('🔌 Configurando conexión a MongoDB...');
-        console.log('URI (oculta):', uri.replace(/:[^:@]+@/, ':****@'));
-        
-        return {
-          uri,
-          serverSelectionTimeoutMS: 30000,
-          socketTimeoutMS: 45000,
-          connectTimeoutMS: 30000,
-          maxPoolSize: 10,
-          minPoolSize: 1,
-          retryWrites: true,
-          retryReads: true,
-          directConnection: false,
-          ssl: true,
-          tls: true,
-          tlsAllowInvalidCertificates: false,
-          tlsAllowInvalidHostnames: false,
-        };
-      },
-    }),
+    MongooseModule.forRoot(
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/redsocial'
+    ),
     PublicacionesModule,
     AuthModule,
     UsuariosModule,
@@ -49,4 +29,26 @@ import { DebugModule } from './debug/debug.module';
   controllers: [AppController, HealthController],
   providers: [AppService, AppLogger],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(@InjectConnection() private connection: Connection) {}
+
+  onModuleInit() {
+    const db = this.connection;
+    
+    console.log('🔌 MongoDB URI configurada:', !!process.env.MONGODB_URI);
+    console.log('📊 Estado inicial de conexión:', db.readyState);
+    
+    db.on('connected', () => {
+      console.log('✅ MongoDB conectado exitosamente');
+      console.log('📊 ReadyState:', db.readyState);
+    });
+    
+    db.on('error', (err) => {
+      console.error('❌ Error de conexión MongoDB:', err.message);
+    });
+    
+    db.on('disconnected', () => {
+      console.warn('⚠️ MongoDB desconectado');
+    });
+  }
+}
