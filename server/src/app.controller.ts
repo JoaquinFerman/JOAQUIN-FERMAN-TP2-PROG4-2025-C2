@@ -6,7 +6,12 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getHello(): any {
+    // Railway healthcheck endpoint - responde inmediatamente sin verificar DB
+    return { 
+      status: 'ok', 
+      message: this.appService.getHello(),
+      timestamp: new Date().toISOString()
+    };
   }
 }
