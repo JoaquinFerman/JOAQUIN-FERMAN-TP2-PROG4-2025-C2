@@ -1,0 +1,32 @@
+# Render manifest to deploy the NestJS server from the `server/` folder.
+# IMPORTANT: Do NOT store secrets here. Instead set them in the Render Dashboard (Service > Environment > Environment Secrets).
+
+services:
+  - type: web
+    name: tp-integrador-server
+    # The env should be 'node' for Node.js apps
+    env: node
+    # The repository and branch will be inferred when you import this repo in Render's UI.
+    # If you create the service from the UI and select this repo, Render will use this manifest.
+    branch: main
+    # Build and start commands run inside the repository root; we set `rootDir` to `server/` so commands run there.
+    rootDir: server
+    buildCommand: "npm install --legacy-peer-deps && npm run build"
+    startCommand: "node ./dist/main.js"
+    # Choose plan: free, starter, standard or enterprise (use free for quick testing)
+    plan: free
+    # Health check (optional). Use `/` or a health endpoint if present.
+    healthCheckPath: "/"
+    # You can optionally set a region, e.g. "oregon" or "iad". Leave blank to use default.
+    # region: oregon
+
+# Notes:
+# - After importing this repo into Render, go to the created service and add the following Environment Secrets under "Environment":
+#   - MONGODB_URI (your MongoDB Atlas connection string)
+#   - JWT_SECRET
+#   - SUPABASE_URL
+#   - SUPABASE_KEY  (use the Supabase service_role key)
+# - Render will run `buildCommand` in the `server/` directory and then start the app with `startCommand`.
+# - If you prefer to deploy using the Render CLI, install it and run `render login` then `render services create --file render.yaml`.
+#   See: https://render.com/docs/cli
+# - Do NOT commit secrets into this file. Use the Render dashboard to add the env vars.

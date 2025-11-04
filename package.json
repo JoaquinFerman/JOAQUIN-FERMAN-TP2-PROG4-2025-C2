@@ -2,8 +2,5 @@
   "name": "tp-integrador-root",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "vercel-build": "cd server && npm install --legacy-peer-deps && npm run build && cd .. && cp -r server/dist api/dist",
-    "build": "npm run vercel-build"
-  }
+  "scripts": {}
 }
