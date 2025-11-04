@@ -37,10 +37,12 @@ import { DebugModule } from './debug/debug.module';
 
         return {
           uri,
-          serverSelectionTimeoutMS: 5000,
+          serverSelectionTimeoutMS: 30000,
           socketTimeoutMS: 45000,
-          connectTimeoutMS: 10000,
+          connectTimeoutMS: 30000,
           family: 4,
+          retryWrites: true,
+          retryReads: true,
         };
       },
     }),
