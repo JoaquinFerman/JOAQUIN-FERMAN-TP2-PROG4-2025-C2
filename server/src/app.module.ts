@@ -17,7 +17,15 @@ import { DebugModule } from './debug/debug.module';
       isGlobal: true,
     }),
     MongooseModule.forRoot(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/redsocial'
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/redsocial',
+      {
+        serverSelectionTimeoutMS: 30000, // 30 seconds timeout
+        socketTimeoutMS: 45000, // 45 seconds socket timeout
+        retryWrites: true,
+        retryReads: true,
+        maxPoolSize: 10,
+        minPoolSize: 2,
+      }
     ),
     PublicacionesModule,
     AuthModule,
