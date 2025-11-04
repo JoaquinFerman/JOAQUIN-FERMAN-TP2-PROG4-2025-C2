@@ -32,6 +32,8 @@ export class PublicacionesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(@Request() req, @Body() createPublicacioneDto: CreatePublicacioneDto) {
+    console.log('🎯 POST /publicaciones - REQUEST RECIBIDO');
+    console.log('🎯 Headers:', req.headers?.authorization);
     // attach owner info from authenticated user (JWT)
     const user = req.user;
     console.log('POST /publicaciones body:', createPublicacioneDto);
