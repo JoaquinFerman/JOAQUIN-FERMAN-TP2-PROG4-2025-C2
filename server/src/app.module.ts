@@ -17,17 +17,29 @@ import { DebugModule } from './debug/debug.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/redsocial',
-      {
-        serverSelectionTimeoutMS: 30000,
-        socketTimeoutMS: 45000,
-        connectTimeoutMS: 30000,
-        family: 4,
-        retryWrites: true,
-        retryReads: true,
-      }
-    ),
+    MongooseModule.forRootAsync({
+      useFactory: async () => {
+        const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/redsocial';
+        console.log('🔌 Configurando conexión a MongoDB...');
+        console.log('URI (oculta):', uri.replace(/:[^:@]+@/, ':****@'));
+        
+        return {
+          uri,
+          serverSelectionTimeoutMS: 30000,
+          socketTimeoutMS: 45000,
+          connectTimeoutMS: 30000,
+          maxPoolSize: 10,
+          minPoolSize: 1,
+          retryWrites: true,
+          retryReads: true,
+          directConnection: false,
+          ssl: true,
+          tls: true,
+          tlsAllowInvalidCertificates: false,
+          tlsAllowInvalidHostnames: false,
+        };
+      },
+    }),
     PublicacionesModule,
     AuthModule,
     UsuariosModule,
