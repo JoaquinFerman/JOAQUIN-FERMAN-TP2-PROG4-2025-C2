@@ -22,9 +22,16 @@ export class PublicacionesService {
       comments: [],
       likedUsers: [],
     });
-    const saved = await post.save();
-    this.logger.log(`Post creado: ${saved._id} (${saved.userName})`);
-    return saved;
+    try {
+      const saved = await post.save();
+      this.logger.log(`Post creado: ${saved._id} (${saved.userName})`);
+      return saved;
+    } catch (err) {
+      this.logger.error(`Error creando publicación (${createPublicacioneDto.userName}): ${err?.message || err}`, err?.stack);
+      // Return a proper HTTP 500
+      const { InternalServerErrorException } = await import('@nestjs/common');
+      throw new InternalServerErrorException('Error interno al crear la publicación');
+    }
   }
 
   async findAll() {
