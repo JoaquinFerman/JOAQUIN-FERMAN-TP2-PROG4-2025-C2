@@ -2,13 +2,12 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copia archivos necesarios
-COPY package.json .
-COPY package-lock.json .
-COPY tsconfig*.json .
-COPY nest-cli.json .
-COPY src ./src
+# Copia archivos del servidor desde la raíz del repositorio
+COPY server/package.json server/package-lock.json ./
+COPY server/tsconfig*.json server/nest-cli.json ./
+COPY server/src ./src
 
+# Instalar dependencias y build
 RUN npm install
 RUN npm run build
 
