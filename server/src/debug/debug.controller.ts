@@ -1,8 +1,12 @@
 import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
 
 @Controller('debug')
 export class DebugController {
+  constructor(@InjectConnection() private connection: Connection) {}
+
   @Get('env')
   getEnvInfo() {
     return {
@@ -14,6 +18,52 @@ export class DebugController {
       hasSupabaseKey: !!process.env.SUPABASE_KEY,
       nodeEnv: process.env.NODE_ENV,
     };
+  }
+
+  @Get('mongo-test')
+  async testMongo() {
+    try {
+      const readyState = this.connection.readyState;
+      const dbName = this.connection.name;
+      
+      if (!this.connection.db) {
+        return {
+          success: false,
+          error: 'Database not initialized',
+          mongooseReadyState: readyState,
+        };
+      }
+      
+      // Intentar leer usuarios directamente
+      const usersCollection = this.connection.db.collection('users');
+      const userCount = await usersCollection.countDocuments();
+      const users = await usersCollection.find({}).limit(3).toArray();
+      
+      return {
+        success: true,
+        mongooseReadyState: readyState,
+        readyStateDescription: {
+          0: 'disconnected',
+          1: 'connected',
+          2: 'connecting',
+          3: 'disconnecting',
+        }[readyState],
+        databaseName: dbName,
+        userCount,
+        users: users.map(u => ({
+          id: u._id,
+          email: u.email,
+          nombreUsuario: u.nombreUsuario,
+        })),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        stack: error.stack,
+        mongooseReadyState: this.connection.readyState,
+      };
+    }
   }
 
   @Post('test-auth')
