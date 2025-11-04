@@ -35,6 +35,11 @@ export class PublicacionesController {
     // attach owner info from authenticated user (JWT)
     const user = req.user;
     console.log('POST /publicaciones body:', createPublicacioneDto);
+    console.log('Authenticated user:', user);
+    // Basic validation
+    if (!createPublicacioneDto || typeof createPublicacioneDto.content !== 'string' || !createPublicacioneDto.content.trim()) {
+      throw new BadRequestException('El contenido de la publicación es requerido');
+    }
     const payload = {
       ...createPublicacioneDto,
       userId: user.sub || user.id || user._id,
@@ -42,7 +47,12 @@ export class PublicacionesController {
       userPhoto: user.imagenPerfil || user.userPhoto || null,
       isOwn: true,
     } as any;
-    return this.publicacionesService.create(payload);
+    try {
+      return this.publicacionesService.create(payload);
+    } catch (err) {
+      console.error('Error creating publication:', err?.message || err, err?.stack);
+      throw new (require('@nestjs/common').InternalServerErrorException)('Error interno al crear la publicación');
+    }
   }
 
   @Get()
