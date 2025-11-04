@@ -73,6 +73,13 @@ export class PublicacionesController {
     @Body() comment: { userName: string; userPhoto?: string; content: string; date?: Date },
   ) {
     console.log(`POST /publicaciones/${id}/comment body:`, comment);
+    // Basic validation
+    if (!comment || typeof comment.content !== 'string' || !comment.content.trim()) {
+      throw new BadRequestException('El contenido del comentario es requerido');
+    }
+    if (!comment.userName || typeof comment.userName !== 'string') {
+      throw new BadRequestException('El userName del comentario es requerido');
+    }
     return this.publicacionesService.addComment(id, comment);
   }
 

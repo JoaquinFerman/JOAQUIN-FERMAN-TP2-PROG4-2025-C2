@@ -81,13 +81,20 @@ export class PublicacionesService {
     
     const newComment = { ...comment, date: comment.date || new Date() };
     post.comments.push(newComment);
-    
+
     this.logger.log(`Comments antes de guardar:`, JSON.stringify(post.comments));
-    const saved = await post.save();
-    this.logger.log(`Comments después de guardar:`, JSON.stringify(saved.comments));
-    this.logger.log(`Comentario creado en post ${postId} por ${comment.userName}`);
-    
-    return saved;
+    try {
+      const saved = await post.save();
+      this.logger.log(`Comments después de guardar:`, JSON.stringify(saved.comments));
+      this.logger.log(`Comentario creado en post ${postId} por ${comment.userName}`);
+      return saved;
+    } catch (err) {
+      this.logger.error(`Error guardando comentario en post ${postId}: ${err?.message || err}`, err?.stack);
+      // Throw an HTTP-friendly exception so client receives a proper 500 response
+      // while preserving a clear message in logs.
+      const { InternalServerErrorException } = await import('@nestjs/common');
+      throw new InternalServerErrorException('Error interno al guardar el comentario');
+    }
   }
 
   async like(postId: string, userId: string) {
