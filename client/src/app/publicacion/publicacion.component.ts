@@ -88,14 +88,9 @@ export class PublicacionComponent {
   }
 
   addComment(content: string) {
-    const userName = this.getUserName();
-    if (!userName) {
-      console.error('No se pudo obtener el nombre de usuario');
-      return;
-    }
+    // El servidor ahora usa JwtAuthGuard y completa userName/userPhoto desde el token
+    // Solo enviamos el contenido
     const comment = {
-      userName,
-      userPhoto: this.getUserPhoto() || undefined,
       content,
       date: new Date()
     };

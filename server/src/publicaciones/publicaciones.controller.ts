@@ -31,7 +31,7 @@ export class PublicacionesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Request() req, @Body() createPublicacioneDto: CreatePublicacioneDto) {
+  async create(@Request() req, @Body() createPublicacioneDto: CreatePublicacioneDto) {
     // attach owner info from authenticated user (JWT)
     const user = req.user;
     console.log('POST /publicaciones body:', createPublicacioneDto);
@@ -43,12 +43,13 @@ export class PublicacionesController {
     const payload = {
       ...createPublicacioneDto,
       userId: user.sub || user.id || user._id,
-      userName: user.nombre || user.nombreUsuario || user.name,
+      userName: user.nombreUsuario || user.nombre || user.name,
       userPhoto: user.imagenPerfil || user.userPhoto || null,
       isOwn: true,
     } as any;
     try {
-      return this.publicacionesService.create(payload);
+      const result = await this.publicacionesService.create(payload);
+      return result;
     } catch (err) {
       console.error('Error creating publication:', err?.message || err, err?.stack);
       throw new (require('@nestjs/common').InternalServerErrorException)('Error interno al crear la publicación');
@@ -78,18 +79,31 @@ export class PublicacionesController {
   }
 
   @Post(':id/comment')
+  @UseGuards(JwtAuthGuard)
   addComment(
+    @Request() req,
     @Param('id') id: string,
-    @Body() comment: { userName: string; userPhoto?: string; content: string; date?: Date },
+    @Body() body: { content: string; date?: Date },
   ) {
-    console.log(`POST /publicaciones/${id}/comment body:`, comment);
-    // Basic validation
-    if (!comment || typeof comment.content !== 'string' || !comment.content.trim()) {
+    // Use authenticated user info instead of trusting client-provided userName/userPhoto
+    const user = req.user || {};
+    const userName = user.nombreUsuario || user.nombre || user.name;
+    const userPhoto = user.imagenPerfil || user.userPhoto || null;
+
+    console.log(`POST /publicaciones/${id}/comment body (from client):`, body);
+    console.log(`Authenticated user for comment:`, { id: user.sub || user.id || user._id, userName, userPhoto });
+
+    if (!body || typeof body.content !== 'string' || !body.content.trim()) {
       throw new BadRequestException('El contenido del comentario es requerido');
     }
-    if (!comment.userName || typeof comment.userName !== 'string') {
-      throw new BadRequestException('El userName del comentario es requerido');
-    }
+
+    const comment = {
+      userName,
+      userPhoto,
+      content: body.content.trim(),
+      date: body.date ? new Date(body.date) : new Date(),
+    } as any;
+
     return this.publicacionesService.addComment(id, comment);
   }
 

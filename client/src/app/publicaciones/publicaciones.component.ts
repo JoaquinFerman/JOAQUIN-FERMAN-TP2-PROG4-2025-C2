@@ -93,33 +93,23 @@ export class PublicacionesComponent implements OnInit {
       return;
     }
     
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const userId = payload.sub;
-      const userName = payload.nombreUsuario;
-      const userPhoto = payload.imagenPerfil;
-      
-      console.log('Creando publicación con:', { userId, userName, userPhoto, content });
-      
-      const nueva = {
-        content,
-        userName,
-        userPhoto,
-        date: new Date(),
-        userId
-      };
-      
-      this.postsService.create(nueva).subscribe({
-        next: () => {
-          console.log('Publicación creada exitosamente');
-          this.cargarPublicaciones();
-        },
-        error: (err) => {
-          console.error('Error al crear publicación:', err);
-        }
-      });
-    } catch (error) {
-      console.error('Error al decodificar token:', error);
-    }
+    console.log('Creando publicación con:', { content });
+    
+    // El servidor usa JwtAuthGuard y completa userId, userName, userPhoto desde el token
+    // Solo enviamos el contenido
+    const nueva = {
+      content,
+      date: new Date()
+    };
+    
+    this.postsService.create(nueva).subscribe({
+      next: () => {
+        console.log('Publicación creada exitosamente');
+        this.cargarPublicaciones();
+      },
+      error: (err) => {
+        console.error('Error al crear publicación:', err);
+      }
+    });
   }
 }
