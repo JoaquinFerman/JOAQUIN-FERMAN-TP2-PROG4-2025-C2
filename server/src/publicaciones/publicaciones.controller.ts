@@ -58,8 +58,13 @@ export class PublicacionesController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   remove(@Request() req, @Param('id') id: string) {
-    const userId = req.user?.sub || req.user?.id || req.user?._id;
-    return this.publicacionesService.remove(id, userId);
+    const user = req.user || {};
+    const userPayload = {
+      id: user.sub || user.id || user._id,
+      nombreUsuario: user.nombreUsuario || user.nombre,
+      nombre: user.nombre || user.nombreUsuario,
+    };
+    return this.publicacionesService.remove(id, userPayload as any);
   }
 
   @Post(':id/comment')

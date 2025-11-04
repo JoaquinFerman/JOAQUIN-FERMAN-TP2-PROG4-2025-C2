@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreatePublicacioneDto } from './dto/create-publicacione.dto';
@@ -20,7 +20,7 @@ export class PublicacionesService {
       liked: false,
       isOwn: createPublicacioneDto.isOwn || false,
       comments: [],
-      likedUsers: []
+      likedUsers: [],
     });
     const saved = await post.save();
     this.logger.log(`Post creado: ${saved._id} (${saved.userName})`);
@@ -47,10 +47,31 @@ export class PublicacionesService {
     return post;
   }
 
-  async remove(id: string) {
-    const post = await this.publicacioneModel.findByIdAndDelete(id).exec();
+  /**
+   * Remove a publication. If userId is provided, verify ownership before deleting.
+   */
+  async remove(id: string, user?: { id?: string; nombreUsuario?: string; nombre?: string }) {
+    const post = await this.publicacioneModel.findById(id).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
-    return post;
+
+    // If caller provided an id use strict ownership check
+    if (user && user.id) {
+      if (String((post as any).userId) !== String(user.id)) {
+        this.logger.warn(`Usuario ${user.id} intentó borrar publicación ${id} sin ser dueño`);
+        throw new ForbiddenException('No permitido: solo el dueño puede eliminar esta publicación');
+      }
+    } else if (user && (user.nombreUsuario || user.nombre)) {
+      // fallback for older records without userId: allow delete if names match
+      const matchesName = (user.nombreUsuario && String(post.userName) === String(user.nombreUsuario)) ||
+        (user.nombre && String(post.userName) === String(user.nombre));
+      if (!matchesName) {
+        this.logger.warn(`Usuario ${JSON.stringify(user)} intentó borrar publicación ${id} sin ser dueño (name mismatch)`);
+        throw new ForbiddenException('No permitido: solo el dueño puede eliminar esta publicación');
+      }
+    }
+
+    const deleted = await this.publicacioneModel.findByIdAndDelete(id).exec();
+    return deleted;
   }
 
   async addComment(postId: string, comment: { userName: string; userPhoto?: string; content: string; date?: Date }) {

@@ -1,5 +1,12 @@
 export class CreatePublicacioneDto {
-	// The server will set userId, userName and userPhoto from the authenticated user.
+	// Content provided by client
 	content: string;
 	date?: Date;
+
+	// Owner fields (set by server when creating) - keep optional for typing
+	userId?: string;
+	userName?: string;
+	userPhoto?: string;
+	isOwn?: boolean;
+	imageUrl?: string;
 }
