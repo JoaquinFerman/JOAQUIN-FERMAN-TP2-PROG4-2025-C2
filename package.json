@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "vercel-build": "cd server && npm ci && npm run build"
+    "vercel-build": "cd server && npm ci && npm run build",
+    "build": "npm run vercel-build"
   }
 }
