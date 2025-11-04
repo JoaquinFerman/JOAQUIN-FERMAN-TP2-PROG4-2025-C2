@@ -2,26 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import * as mongoose from 'mongoose';
 
 async function bootstrap() {
-  // Log MongoDB connection attempts
-  console.log('🔌 Attempting to connect to MongoDB...');
+  console.log('� Starting server...');
   console.log('📍 MONGODB_URI present:', !!process.env.MONGODB_URI);
-  console.log('📍 MONGODB_URI start:', process.env.MONGODB_URI?.substring(0, 30));
   
-  mongoose.connection.on('connected', () => {
-    console.log('✅ MongoDB connected successfully');
-  });
-  
-  mongoose.connection.on('error', (err) => {
-    console.error('❌ MongoDB connection error:', err);
-  });
-  
-  mongoose.connection.on('disconnected', () => {
-    console.log('⚠️  MongoDB disconnected');
-  });
-
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const { HttpExceptionFilter } = await import('./filters/http-exception.filter.js');
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -43,6 +28,6 @@ async function bootstrap() {
   
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(`🚀 Server running on port ${port}`);
+  console.log(`✅ Server running on port ${port}`);
 }
 bootstrap();
