@@ -7,7 +7,16 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const { HttpExceptionFilter } = await import('./filters/http-exception.filter.js');
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.enableCors();
+  // CORS configuration: if the environment variable CLIENT_URLS is set (comma-separated),
+  // use it as the allowed origins. Otherwise fall back to permissive CORS (existing behaviour).
+  // Example: CLIENT_URLS="https://tp-integrador.vercel.app,http://localhost:4200"
+  const clientUrls = process.env.CLIENT_URLS;
+  if (clientUrls) {
+    const origins = clientUrls.split(',').map((s) => s.trim()).filter(Boolean);
+    app.enableCors({ origin: origins });
+  } else {
+    app.enableCors();
+  }
   
   // Servir archivos estáticos desde la carpeta uploads
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {

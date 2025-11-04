@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import { AuthService } from '../services/auth';
 import { NotificationService } from '../services/notification.service';
+import { API_BASE } from '../config';
 
 @Component({
   selector: 'app-mi-perfil',
@@ -99,7 +100,7 @@ export class MiPerfilComponent {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
       
-      this.http.post<any>('http://localhost:3000/auth/upload-image', formData).subscribe({
+  this.http.post<any>(`${API_BASE}/auth/upload-image`, formData).subscribe({
         next: (response) => {
           console.log('Imagen subida:', response);
           datos.imagenPerfil = response.imagenUrl;
@@ -116,7 +117,7 @@ export class MiPerfilComponent {
   }
 
   private actualizarPerfil(userId: string, datos: any) {
-    this.http.patch(`http://localhost:3000/usuarios/${userId}`, datos).subscribe({
+  this.http.patch(`${API_BASE}/usuarios/${userId}`, datos).subscribe({
       next: (resp: any) => {
         console.log('Respuesta del servidor:', resp);
         Object.assign(this.usuario, resp);

@@ -31,6 +31,13 @@ En la pantalla del servicio en Render: Settings → Environment → Environment 
 - SUPABASE_URL = https://xxxxx.supabase.co
 - SUPABASE_KEY = <service_role_key> (¡USAR SERVICE ROLE KEY!)
 
+Nota de CORS: puedes restringir qué orígenes web pueden acceder a tu API configurando la variable de entorno `CLIENT_URLS` en Render.
+Por ejemplo:
+
+  CLIENT_URLS = https://tu-app-client.vercel.app,http://localhost:4200
+
+Si `CLIENT_URLS` no está presente, la app dejará CORS permissivo (igual que antes). Se recomienda establecerlo en producción.
+
 4) Conexión a MongoDB Atlas
 - En Atlas, permite conexiones desde las IPs de Render o temporalmente habilita 0.0.0.0/0 para pruebas.
 - Asegúrate que el usuario y contraseña en `MONGODB_URI` son válidos.

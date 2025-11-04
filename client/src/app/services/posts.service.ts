@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_BASE } from '../config';
 
 @Injectable({ providedIn: 'root' })
 export class PostsService {
-  private apiUrl = 'http://localhost:3000/publicaciones';
+  private apiUrl = `${API_BASE}/publicaciones`;
 
   constructor(private http: HttpClient) {}
 
