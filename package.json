@@ -1,0 +1,8 @@
+{
+  "name": "tp-integrador-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "vercel-build": "cd server && npm ci && npm run build"
+  }
+}
