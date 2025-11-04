@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
+import * as mongoose from 'mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppLogger } from './logger/logger';
@@ -16,17 +17,33 @@ import { DebugModule } from './debug/debug.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/redsocial',
-      {
-        serverSelectionTimeoutMS: 30000, // 30 seconds timeout
-        socketTimeoutMS: 45000, // 45 seconds socket timeout
-        retryWrites: true,
-        retryReads: true,
-        maxPoolSize: 10,
-        minPoolSize: 2,
-      }
-    ),
+    MongooseModule.forRootAsync({
+      useFactory: () => {
+        const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/redsocial';
+        console.log('🔌 Conectando a MongoDB Atlas...');
+        console.log('URI:', uri.replace(/:[^:@]+@/, ':****@')); // Hide password
+        
+        mongoose.connection.on('connected', () => {
+          console.log('✅ MongoDB conectado exitosamente');
+        });
+        
+        mongoose.connection.on('error', (err) => {
+          console.error('❌ Error de conexión MongoDB:', err.message);
+        });
+        
+        mongoose.connection.on('disconnected', () => {
+          console.warn('⚠️ MongoDB desconectado');
+        });
+
+        return {
+          uri,
+          serverSelectionTimeoutMS: 5000,
+          socketTimeoutMS: 45000,
+          connectTimeoutMS: 10000,
+          family: 4,
+        };
+      },
+    }),
     PublicacionesModule,
     AuthModule,
     UsuariosModule,
