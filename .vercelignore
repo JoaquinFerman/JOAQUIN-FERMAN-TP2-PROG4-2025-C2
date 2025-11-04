@@ -4,3 +4,5 @@ server/dist
 node_modules
 .env
 .env.local
+api/dist/src/*.spec.js
+api/dist/test
