@@ -10,7 +10,7 @@ import { AuthController } from './auth.controller';
     UsuariosModule,
     SupabaseModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'mi_clave_secreta',
+      secret: process.env.JWT_SECRET || '3da588f1998d829738b1207f2501f84b',
       signOptions: { expiresIn: '1h' },
     }),
   ],
