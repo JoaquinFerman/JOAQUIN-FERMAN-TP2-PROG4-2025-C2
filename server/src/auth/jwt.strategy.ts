@@ -15,10 +15,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    const usuario = await this.usuariosService.findOne(payload.sub);
-    if (!usuario) {
-      throw new UnauthorizedException();
+    console.log('JwtStrategy.validate - Payload:', payload);
+    console.log('JwtStrategy.validate - Looking for user ID:', payload.sub);
+    try {
+      const usuario = await this.usuariosService.findOne(payload.sub);
+      if (!usuario) {
+        console.log('JwtStrategy.validate - User not found');
+        throw new UnauthorizedException();
+      }
+      console.log('JwtStrategy.validate - User found:', usuario.nombreUsuario);
+      return usuario;
+    } catch (error) {
+      console.error('JwtStrategy.validate - Error:', error.message);
+      throw new UnauthorizedException('Token inválido o usuario no encontrado');
     }
-    return usuario;
   }
 }

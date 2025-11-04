@@ -70,15 +70,27 @@ export class UsuariosService {
   }
 
   async findOne(id: string): Promise<Usuario> {
-    const usuario = await this.usuarioModel.findById(id)
-      .select('-password')
-      .exec();
-    
-    if (!usuario) {
-      throw new NotFoundException('Usuario no encontrado');
+    try {
+      console.log('UsuariosService.findOne - Looking for user with ID:', id);
+      const usuario = await this.usuarioModel.findById(id)
+        .select('-password')
+        .exec();
+      
+      if (!usuario) {
+        console.log('UsuariosService.findOne - User not found for ID:', id);
+        throw new NotFoundException('Usuario no encontrado');
+      }
+      
+      console.log('UsuariosService.findOne - User found:', usuario.nombreUsuario);
+      return usuario;
+    } catch (error) {
+      console.error('UsuariosService.findOne - Error:', error.message);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      // Invalid ObjectId format or other database errors
+      throw new NotFoundException('Usuario no encontrado o ID inválido');
     }
-    
-    return usuario;
   }
 
   async findByEmail(email: string): Promise<Usuario | null> {
