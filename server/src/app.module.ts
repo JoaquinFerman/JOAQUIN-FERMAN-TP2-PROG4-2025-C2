@@ -9,6 +9,7 @@ import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { SupabaseModule } from './supabase/supabase.module';
+import { DebugModule } from './debug/debug.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SupabaseModule } from './supabase/supabase.module';
     AuthModule,
     UsuariosModule,
     SupabaseModule,
+    DebugModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, AppLogger],
