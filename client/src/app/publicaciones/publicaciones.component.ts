@@ -21,11 +21,19 @@ export class PublicacionesComponent implements OnInit {
   mostrarPerfil = false;
   onCrearPublicacion(event: Event) {
     event.preventDefault();
-    const input = (event.target as HTMLFormElement).elements.namedItem('content') as HTMLInputElement;
-    const value = input.value.trim();
-    if (value) {
-      this.crearPublicacion(value);
-      input.value = '';
+    const form = event.target as HTMLFormElement;
+    const titleInput = form.elements.namedItem('title') as HTMLInputElement | null;
+    const descInput = form.elements.namedItem('description') as HTMLInputElement | null;
+    const contentInput = form.elements.namedItem('content') as HTMLInputElement;
+    const title = titleInput ? (titleInput.value || '').trim() : '';
+    const description = descInput ? (descInput.value || '').trim() : '';
+    const content = contentInput.value.trim();
+    if (content) {
+      this.crearPublicacion(content, title || undefined, description || undefined);
+      // clear inputs
+      if (titleInput) titleInput.value = '';
+      if (descInput) descInput.value = '';
+      contentInput.value = '';
     }
   }
 
@@ -64,17 +72,30 @@ export class PublicacionesComponent implements OnInit {
   }
 
   cargarPublicaciones() {
-    this.postsService.getAll().subscribe(posts => {
-      let orderedPosts = [...posts];
-      if (this.orden === 'fecha') {
-        orderedPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // Use server-side pagination when possible
+    const offset = (this.paginaActual - 1) * this.publicacionesPorPagina;
+    const limit = this.publicacionesPorPagina;
+    this.postsService.getAllPaginated({ order: this.orden, offset, limit }).subscribe(res => {
+      // Server returns either { total, posts } when paginated or an array (legacy)
+      if (res && res.posts) {
+        this.publicaciones = res.posts;
+        this.totalPaginas = Math.ceil(res.total / this.publicacionesPorPagina) || 1;
+      } else if (Array.isArray(res)) {
+        let orderedPosts = [...res];
+        if (this.orden === 'fecha') {
+          orderedPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        } else {
+          orderedPosts.sort((a, b) => b.likesCount - a.likesCount);
+        }
+        this.totalPaginas = Math.ceil(orderedPosts.length / this.publicacionesPorPagina);
+        const start = (this.paginaActual - 1) * this.publicacionesPorPagina;
+        const end = start + this.publicacionesPorPagina;
+        this.publicaciones = orderedPosts.slice(start, end);
       } else {
-        orderedPosts.sort((a, b) => b.likesCount - a.likesCount);
+        // fallback
+        this.publicaciones = res || [];
+        this.totalPaginas = 1;
       }
-      this.totalPaginas = Math.ceil(orderedPosts.length / this.publicacionesPorPagina);
-      const start = (this.paginaActual - 1) * this.publicacionesPorPagina;
-      const end = start + this.publicacionesPorPagina;
-      this.publicaciones = orderedPosts.slice(start, end);
     });
   }
 
@@ -84,23 +105,24 @@ export class PublicacionesComponent implements OnInit {
     this.cargarPublicaciones();
   }
 
-  crearPublicacion(content: string) {
+  crearPublicacion(content: string, title?: string, description?: string) {
     if (!content.trim()) return;
-    
+
     const token = this.authService.getToken();
     if (!token) {
       console.error('No hay token de autenticación para crear publicación');
       return;
     }
-    
-    console.log('Creando publicación con:', { content });
-    
-    // El servidor usa JwtAuthGuard y completa userId, userName, userPhoto desde el token
-    // Solo enviamos el contenido
-    const nueva = {
+
+    console.log('Creando publicación con:', { title, description, content });
+
+    // The server will attach user info from the JWT. Send title/description/content
+    const nueva: any = {
       content,
-      date: new Date()
+      date: new Date(),
     };
+    if (title) nueva.title = title;
+    if (description) nueva.description = description;
     
     this.postsService.create(nueva).subscribe({
       next: () => {

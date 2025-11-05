@@ -13,6 +13,15 @@ export class PostsService {
     return this.http.get<any[]>(this.apiUrl);
   }
 
+  getAllPaginated(options?: { order?: 'fecha' | 'meGusta'; userId?: string; offset?: number; limit?: number }): Observable<any> {
+    let params: any = {};
+    if (options?.order) params.order = options.order;
+    if (options?.userId) params.userId = options.userId;
+    if (typeof options?.offset === 'number') params.offset = String(options.offset);
+    if (typeof options?.limit === 'number') params.limit = String(options.limit);
+    return this.http.get<any>(this.apiUrl, { params });
+  }
+
   getById(id: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }

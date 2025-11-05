@@ -15,12 +15,16 @@ export class PublicacionesService {
   async create(createPublicacioneDto: CreatePublicacioneDto) {
     const post = new this.publicacioneModel({
       ...createPublicacioneDto,
+      title: createPublicacioneDto.title || undefined,
+      description: createPublicacioneDto.description || undefined,
+      content: createPublicacioneDto.content || undefined,
       date: createPublicacioneDto.date || new Date(),
       likesCount: 0,
       liked: false,
       isOwn: createPublicacioneDto.isOwn || false,
       comments: [],
       likedUsers: [],
+      deleted: false,
     });
     try {
       const saved = await post.save();
@@ -34,12 +38,39 @@ export class PublicacionesService {
     }
   }
 
-  async findAll() {
-    return this.publicacioneModel.find().exec();
+  async findAll(options?: { order?: 'fecha' | 'meGusta'; userId?: string; offset?: number; limit?: number }) {
+    const filter: any = { deleted: { $ne: true } };
+    if (options?.userId) filter.userId = String(options.userId);
+
+    let query = this.publicacioneModel.find(filter);
+
+    // Sorting
+    if (options?.order === 'meGusta') {
+      query = query.sort({ likesCount: -1 });
+    } else {
+      query = query.sort({ date: -1 });
+    }
+
+    // Pagination
+    if (typeof options?.offset === 'number' && options.offset > 0) {
+      query = query.skip(options.offset);
+    }
+    if (typeof options?.limit === 'number' && options.limit > 0) {
+      query = query.limit(options.limit);
+    }
+
+    const posts = await query.exec();
+
+    if (typeof options?.limit === 'number' && options.limit > 0) {
+      const total = await this.publicacioneModel.countDocuments(filter).exec();
+      return { total, posts } as any;
+    }
+
+    return posts;
   }
 
   async findOne(id: string) {
-    const post = await this.publicacioneModel.findById(id).exec();
+    const post = await this.publicacioneModel.findOne({ _id: id, deleted: { $ne: true } }).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
     return post;
   }
@@ -61,29 +92,34 @@ export class PublicacionesService {
     const post = await this.publicacioneModel.findById(id).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
 
-    // If caller provided an id use strict ownership check
+    // Logical deletion: only owner or admin
     if (user && user.id) {
       if (String((post as any).userId) !== String(user.id)) {
-        this.logger.warn(`Usuario ${user.id} intentó borrar publicación ${id} sin ser dueño`);
-        throw new ForbiddenException('No permitido: solo el dueño puede eliminar esta publicación');
+        // if user has roles and includes admin, allow
+        const u: any = user as any;
+        if (!u.roles || !Array.isArray(u.roles) || !u.roles.includes('admin')) {
+          this.logger.warn(`Usuario ${user.id} intentó borrar publicación ${id} sin ser dueño`);
+          throw new ForbiddenException('No permitido: solo el dueño o un administrador puede eliminar esta publicación');
+        }
       }
     } else if (user && (user.nombreUsuario || user.nombre)) {
-      // fallback for older records without userId: allow delete if names match
       const matchesName = (user.nombreUsuario && String(post.userName) === String(user.nombreUsuario)) ||
         (user.nombre && String(post.userName) === String(user.nombre));
       if (!matchesName) {
         this.logger.warn(`Usuario ${JSON.stringify(user)} intentó borrar publicación ${id} sin ser dueño (name mismatch)`);
-        throw new ForbiddenException('No permitido: solo el dueño puede eliminar esta publicación');
+        throw new ForbiddenException('No permitido: solo el dueño o un administrador puede eliminar esta publicación');
       }
     }
 
-    const deleted = await this.publicacioneModel.findByIdAndDelete(id).exec();
-    return deleted;
+    post.deleted = true;
+    post.deletedAt = new Date();
+    const saved = await post.save();
+    return saved;
   }
 
   async addComment(postId: string, comment: { userName: string; userPhoto?: string; content: string; date?: Date }) {
     this.logger.log(`Agregando comentario al post ${postId}:`, JSON.stringify(comment));
-    const post = await this.publicacioneModel.findById(postId).exec();
+  const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
     
     const newComment = { ...comment, date: comment.date || new Date() };
@@ -106,7 +142,7 @@ export class PublicacionesService {
 
   async like(postId: string, userId: string) {
     this.logger.log(`Agregando like al post ${postId} por usuario ${userId}`);
-    const post = await this.publicacioneModel.findById(postId).exec();
+  const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
     
     post.likedUsers = post.likedUsers || [];
@@ -128,7 +164,7 @@ export class PublicacionesService {
 
   async unlike(postId: string, userId: string) {
     this.logger.log(`Quitando like del post ${postId} por usuario ${userId}`);
-    const post = await this.publicacioneModel.findById(postId).exec();
+  const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
     
     post.likedUsers = post.likedUsers || [];

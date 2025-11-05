@@ -32,11 +32,23 @@ export class Publicacione {
 	@Prop()
 	userPhoto?: string;
 
+	@Prop()
+	title?: string;
+
+	@Prop()
+	description?: string;
+
 	@Prop({ required: true })
 	content: string;
 
 	@Prop({ default: Date.now })
 	date: Date;
+
+	@Prop({ default: false })
+	deleted: boolean;
+
+	@Prop()
+	deletedAt?: Date;
 
 	@Prop({ default: false })
 	isOwn: boolean;

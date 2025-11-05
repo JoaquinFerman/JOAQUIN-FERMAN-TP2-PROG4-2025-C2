@@ -12,6 +12,7 @@ import {
   BadRequestException,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -59,8 +60,18 @@ export class PublicacionesController {
   }
 
   @Get()
-  findAll() {
-    return this.publicacionesService.findAll();
+  findAll(
+    @Query('order') order?: 'fecha' | 'meGusta',
+    @Query('userId') userId?: string,
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const opts: any = {};
+    if (order) opts.order = order;
+    if (userId) opts.userId = userId;
+    if (offset) opts.offset = Number(offset);
+    if (limit) opts.limit = Number(limit);
+    return this.publicacionesService.findAll(opts);
   }
 
   @Get(':id')
@@ -76,6 +87,7 @@ export class PublicacionesController {
       id: user.sub || user.id || user._id,
       nombreUsuario: user.nombreUsuario || user.nombre,
       nombre: user.nombre || user.nombreUsuario,
+      roles: user.roles || [],
     };
     return this.publicacionesService.remove(id, userPayload as any);
   }
