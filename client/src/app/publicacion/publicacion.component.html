@@ -31,5 +31,15 @@
         <button type="submit">Comentar</button>
       </form>
     </div>
+    <div class="publicacion-expandida" *ngIf="expandida">
+      <img *ngIf="data.imageUrl" [src]="data.imageUrl" alt="Imagen de la publicación">
+      <div class="comentarios">
+        <div *ngFor="let comentario of data.comments">
+          <p>{{comentario.content}}</p>
+          <small *ngIf="comentario.modified">(Editado)</small>
+        </div>
+        <button (click)="cargarMasComentarios()">Cargar más</button>
+      </div>
+    </div>
   </div>
 }

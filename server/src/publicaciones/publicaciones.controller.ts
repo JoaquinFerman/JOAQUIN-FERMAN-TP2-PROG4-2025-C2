@@ -173,5 +173,11 @@ export class PublicacionesController {
     console.log(`POST /publicaciones/${id}/unlike body:`, userId);
     return this.publicacionesService.unlike(id, userId);
   }
+
+  @Get('last-three')
+  async getLastThreePosts(@Request() req) {
+    const userId = req.user.id;
+    return this.publicacionesService.findLastThreeByUser(userId);
+  }
 }
 

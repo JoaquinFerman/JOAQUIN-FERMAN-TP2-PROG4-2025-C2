@@ -179,4 +179,12 @@ export class PublicacionesService {
     
     return saved;
   }
+
+  async findLastThreeByUser(userId: string) {
+    return this.publicacioneModel
+      .find({ userId, deleted: { $ne: true } })
+      .sort({ date: -1 })
+      .limit(3)
+      .exec();
+  }
 }

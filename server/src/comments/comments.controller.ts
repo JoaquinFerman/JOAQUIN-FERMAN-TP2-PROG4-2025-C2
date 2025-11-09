@@ -13,12 +13,14 @@ export class CommentsController {
     @Query('page') page: number,
     @Query('limit') limit: number,
   ) {
-    return this.commentsService.getComments(postId, page, limit);
+    const comments = await this.commentsService.getComments(postId, page, limit);
+    return { message: 'Comments fetched successfully', comments };
   }
 
   @Post()
   async addComment(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentsService.addComment(createCommentDto);
+    const comment = await this.commentsService.addComment(createCommentDto);
+    return { message: 'Comment added successfully', comment };
   }
 
   @Put(':commentId')
@@ -26,6 +28,7 @@ export class CommentsController {
     @Param('commentId') commentId: string,
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
-    return this.commentsService.updateComment(commentId, updateCommentDto);
+    const updatedComment = await this.commentsService.updateComment(commentId, updateCommentDto);
+    return { message: 'Comment updated successfully', updatedComment };
   }
 }

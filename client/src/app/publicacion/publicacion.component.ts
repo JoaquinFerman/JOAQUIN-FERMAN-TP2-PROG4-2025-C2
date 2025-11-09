@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth';
 })
 export class PublicacionComponent {
   @Input() data: any;
+  expandida = false;
   
   constructor(private postsService: PostsService, private authService: AuthService) {}
   
@@ -135,5 +136,10 @@ export class PublicacionComponent {
       console.error('Error al decodificar token:', error);
       return null;
     }
+  }
+
+  cargarMasComentarios() {
+    console.log('Cargando más comentarios...');
+    // Lógica para cargar más comentarios
   }
 }
