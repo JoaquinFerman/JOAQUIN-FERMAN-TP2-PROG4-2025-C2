@@ -19,6 +19,7 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { LoginDto } from './dto/login.dto';
 import { CreateUsuarioDto } from '../usuarios/dto/create-usuario.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { Multer } from 'multer';
 
 @Controller('auth')
 export class AuthController {
@@ -90,6 +91,41 @@ export class AuthController {
       // Log server-side and rethrow a clearer internal error so the client gets the message
       console.error('[AuthController] uploadImage error:', err?.message || err);
       throw new Error('Error uploading image: ' + (err?.message || err));
+    }
+  }
+
+  @Post('upload-post-image')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: memoryStorage(),
+    fileFilter: (req, file, cb) => {
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+        return cb(new BadRequestException('Solo se permiten archivos de imagen'), false);
+      }
+      cb(null, true);
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    },
+  }))
+  @HttpCode(HttpStatus.OK)
+  async uploadPostImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('postId') postId: string,
+  ) {
+    if (!file || !file.buffer) {
+      throw new BadRequestException('No se proporcionó ningún archivo');
+    }
+    if (!postId) {
+      throw new BadRequestException('No se proporcionó el ID del post');
+    }
+    const randomName = `${postId}/${Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')}${extname(file.originalname)}`;
+    const path = `posts/${randomName}`;
+    try {
+      const url = await this.supabaseService.uploadFile('posts', path, file.buffer, file.mimetype as string);
+      return { imagenUrl: url, filename: randomName };
+    } catch (err) {
+      console.error('[AuthController] uploadPostImage error:', err?.message || err);
+      throw new Error('Error uploading post image: ' + (err?.message || err));
     }
   }
 }

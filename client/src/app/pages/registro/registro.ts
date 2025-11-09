@@ -35,7 +35,6 @@ export class RegistroComponent {
       ]],
       confirmPassword: ['', [Validators.required]],
       fechaNacimiento: ['', [Validators.required, this.ageValidator]],
-      descripcion: ['', [Validators.maxLength(500)]],
       imagenPerfil: ['']
     }, { validators: this.passwordMatchValidator });
   }
@@ -157,8 +156,7 @@ export class RegistroComponent {
       'nombreUsuario': 'Nombre de usuario',
       'password': 'Contraseña',
       'confirmPassword': 'Confirmar contraseña',
-      'fechaNacimiento': 'Fecha de nacimiento',
-      'descripcion': 'Descripción'
+      'fechaNacimiento': 'Fecha de nacimiento'
     };
     return names[field] || field;
   }

@@ -31,10 +31,5 @@ export class CreateUsuarioDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(500)
-  descripcion?: string;
-
-  @IsOptional()
-  @IsString()
   imagenPerfil?: string;
 }

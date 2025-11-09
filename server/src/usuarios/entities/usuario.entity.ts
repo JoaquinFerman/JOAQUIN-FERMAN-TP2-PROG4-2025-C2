@@ -26,9 +26,6 @@ export class Usuario {
   @Prop({ required: true })
   fechaNacimiento: Date;
 
-  @Prop({ trim: true, maxlength: 500 })
-  descripcion?: string;
-
   @Prop()
   imagenPerfil?: string;
 
