@@ -122,7 +122,11 @@ export class PublicacionesService {
   const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
     
-    const newComment = { ...comment, date: comment.date || new Date() };
+    const newComment = { 
+      ...comment, 
+      date: comment.date || new Date(),
+      modified: false
+    };
     post.comments.push(newComment);
 
     this.logger.log(`Comments antes de guardar:`, JSON.stringify(post.comments));
@@ -186,5 +190,52 @@ export class PublicacionesService {
       .sort({ date: -1 })
       .limit(3)
       .exec();
+  }
+
+  async getCommentsPaginated(postId: string, page: number = 1, limit: number = 10) {
+    const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
+    if (!post) throw new NotFoundException('Publicación no encontrada');
+    
+    // Ordenar comentarios por fecha (más recientes primero)
+    const allComments = [...post.comments].sort((a: any, b: any) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedComments = allComments.slice(startIndex, endIndex);
+    
+    return {
+      comments: paginatedComments,
+      total: allComments.length,
+      page,
+      limit,
+      hasMore: endIndex < allComments.length
+    };
+  }
+
+  async editComment(postId: string, commentId: string, userId: string, newContent: string) {
+    this.logger.log(`Editando comentario ${commentId} del post ${postId} por usuario ${userId}`);
+    const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
+    if (!post) throw new NotFoundException('Publicación no encontrada');
+    
+    const comment = post.comments.find((c: any) => c._id && c._id.toString() === commentId);
+    if (!comment) throw new NotFoundException('Comentario no encontrado');
+    
+    // Verificar que el usuario sea el autor del comentario
+    // Comparar por userName ya que los comentarios no tienen userId
+    const commentAny = comment as any;
+    if (commentAny.userName !== userId) {
+      this.logger.warn(`Usuario ${userId} intentó editar comentario de ${commentAny.userName}`);
+      throw new ForbiddenException('Solo el autor del comentario puede editarlo');
+    }
+    
+    commentAny.content = newContent;
+    commentAny.modified = true;
+    commentAny.modifiedAt = new Date();
+    
+    const saved = await post.save();
+    this.logger.log(`Comentario ${commentId} editado exitosamente`);
+    return saved;
   }
 }

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth';
+import { SessionService } from '../../services/session.service';
 import { ErrorMessageComponent } from '../../components/error-message/error-message';
 
 @Component({
@@ -20,7 +21,8 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private sessionService: SessionService
   ) {
     this.loginForm = this.fb.group({
       emailOrUsername: ['', [Validators.required, Validators.minLength(3)]],
@@ -54,6 +56,8 @@ export class LoginComponent {
           this.isLoading = false;
           if (res && res.access_token) {            
             this.authService.setToken(res.access_token);
+            localStorage.setItem('access_token', res.access_token);
+            this.sessionService.iniciarContador(); // Iniciar contador de sesión
             this.successMsg = '¡Login exitoso!';
             setTimeout(() => {
               this.router.navigate(['/publicaciones']);

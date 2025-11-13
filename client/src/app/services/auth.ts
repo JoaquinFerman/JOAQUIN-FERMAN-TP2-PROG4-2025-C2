@@ -27,5 +27,18 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('access_token');
+  }
+
+  validarToken(token: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/autorizar`, { token });
+  }
+
+  refrescarToken(token: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/refrescar`, { token });
   }
 }

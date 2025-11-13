@@ -128,4 +128,16 @@ export class AuthController {
       throw new Error('Error uploading post image: ' + (err?.message || err));
     }
   }
+
+  @Post('autorizar')
+  @HttpCode(HttpStatus.OK)
+  async autorizar(@Body('token') token: string) {
+    return this.authService.validarToken(token);
+  }
+
+  @Post('refrescar')
+  @HttpCode(HttpStatus.OK)
+  async refrescar(@Body('token') token: string) {
+    return this.authService.refrescarToken(token);
+  }
 }

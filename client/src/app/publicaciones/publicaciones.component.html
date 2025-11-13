@@ -10,9 +10,8 @@
     <app-mi-perfil [usuario]="usuario" [publicaciones]="publicaciones" (cerrarPerfil)="mostrarPerfil = false"></app-mi-perfil>
   }
   <form class="form-publicar" (submit)="onCrearPublicacion($event)" style="margin-bottom: 2rem; display: flex; gap: 1rem; flex-direction: column;">
-    <input type="text" name="title" placeholder="Título (opcional)" style="padding:0.5rem; border-radius:8px; border:1px solid #ccc;">
-    <input type="text" name="description" placeholder="Descripción (opcional)" style="padding:0.5rem; border-radius:8px; border:1px solid #ccc;">
-    <input type="text" name="content" placeholder="¿Qué quieres publicar?" style="flex:1; padding:0.5rem; border-radius:8px; border:1px solid #ccc;" required>
+    <textarea name="content" placeholder="¿Qué quieres publicar?" style="flex:1; padding:0.5rem; border-radius:8px; border:1px solid #ccc; min-height:80px; resize:vertical;" required></textarea>
+    <input type="file" name="image" accept="image/*" style="margin-bottom:1rem;">
     <div style="display:flex; gap:1rem; justify-content:flex-end;">
       <button type="submit" style="background: #667eea; color: #fff; border-radius: 8px; padding: 0.5rem 1.2rem; font-weight: 500; border: none; cursor: pointer;">Publicar</button>
     </div>

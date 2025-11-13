@@ -1,2 +1,7 @@
 <app-toast></app-toast>
 <router-outlet></router-outlet>
+<app-session-modal
+  *ngIf="showSessionModal"
+  (extender)="onExtenderSesion()"
+  (cerrar)="onCerrarModal()">
+</app-session-modal>

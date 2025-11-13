@@ -142,7 +142,12 @@ export class PublicacionesController {
   )
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async uploadPublicationImage(@Request() req, @Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+  async uploadPublicationImage(
+    @Request() req,
+    @Param('id') id: string,
+    @Query('imageIndex') imageIndex: string,
+    @UploadedFile() file: Express.Multer.File
+  ) {
     if (!file || !file.buffer) {
       throw new BadRequestException('No se proporcionó ningún archivo');
     }
@@ -155,17 +160,14 @@ export class PublicacionesController {
       throw new BadRequestException('No permitido: solo el dueño puede subir imágenes a esta publicación');
     }
 
-    const randomName =
-      Array(32)
-        .fill(null)
-        .map(() => Math.round(Math.random() * 16).toString(16))
-        .join('') + extname(file.originalname);
-    const path = `publicaciones/${id}/${randomName}`;
+    // Use naming convention: postId:imageIndex
+    const filename = `${id}:${imageIndex || '1'}${extname(file.originalname)}`;
+    const path = `posts/${filename}`;
     const url = await this.supabaseService.uploadFile('publicaciones', path, file.buffer, file.mimetype as string);
 
     // attach image url to the publication document
     const updated = await this.publicacionesService.update(id, { imageUrl: url } as any);
-    return { imageUrl: url, filename: randomName, publication: updated };
+    return { imageUrl: url, filename, publication: updated };
   }
 
   @Post(':id/unlike')
@@ -178,6 +180,35 @@ export class PublicacionesController {
   async getLastThreePosts(@Request() req) {
     const userId = req.user.id;
     return this.publicacionesService.findLastThreeByUser(userId);
+  }
+
+  @Get(':id/comments')
+  async getComments(
+    @Param('id') id: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 10;
+    return this.publicacionesService.getCommentsPaginated(id, pageNum, limitNum);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':postId/comments/:commentId/edit')
+  async editComment(
+    @Request() req,
+    @Param('postId') postId: string,
+    @Param('commentId') commentId: string,
+    @Body() body: { content: string },
+  ) {
+    const user = req.user || {};
+    const userId = user.sub || user.id || user._id;
+    
+    if (!body || typeof body.content !== 'string' || !body.content.trim()) {
+      throw new BadRequestException('El contenido del comentario es requerido');
+    }
+
+    return this.publicacionesService.editComment(postId, commentId, userId, body.content.trim());
   }
 }
 

@@ -5,8 +5,8 @@
         <img [src]="data.userPhoto" alt="Foto de usuario" class="foto-usuario">
       }
       <span class="usuario-nombre">{{data.userName}}</span>
-      <span class="fecha">{{data.date | date:'short'}}</span>
-      @if (data.isOwn) {
+      <span class="fecha">{{data.date | date:'short'}} </span>
+      @if (data.isOwn === true) {
         <button (click)="deletePost()">Eliminar</button>
       }
     </div>
@@ -14,11 +14,10 @@
       <p>{{data.content}}</p>
     </div>
     <div class="publicacion-footer">
-      @if (!data.liked) {
-        <button (click)="like()">Me gusta</button>
-      }
-      @if (data.liked) {
+      @if (data.liked === true) {
         <button (click)="unlike()">Quitar me gusta</button>
+      } @else {
+        <button (click)="like()">Me gusta</button>
       }
       <span>{{data.likesCount}} me gusta</span>
     </div>

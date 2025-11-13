@@ -12,7 +12,7 @@ import { JwtStrategy } from './jwt.strategy';
     SupabaseModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || '3da588f1998d829738b1207f2501f84b',
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '15m' },
     }),
   ],
   providers: [AuthService, JwtStrategy],

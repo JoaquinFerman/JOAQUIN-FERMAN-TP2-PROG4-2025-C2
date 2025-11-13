@@ -22,18 +22,14 @@ export class PublicacionesComponent implements OnInit {
   onCrearPublicacion(event: Event) {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
-    const titleInput = form.elements.namedItem('title') as HTMLInputElement | null;
-    const descInput = form.elements.namedItem('description') as HTMLInputElement | null;
-    const contentInput = form.elements.namedItem('content') as HTMLInputElement;
-    const title = titleInput ? (titleInput.value || '').trim() : '';
-    const description = descInput ? (descInput.value || '').trim() : '';
+    const contentInput = form.elements.namedItem('content') as HTMLTextAreaElement;
+    const imageInput = form.elements.namedItem('image') as HTMLInputElement;
     const content = contentInput.value.trim();
+    const imageFiles = imageInput && imageInput.files ? Array.from(imageInput.files) : [];
     if (content) {
-      this.crearPublicacion(content, title || undefined, description || undefined);
-      // clear inputs
-      if (titleInput) titleInput.value = '';
-      if (descInput) descInput.value = '';
+      this.crearPublicacion(content, imageFiles);
       contentInput.value = '';
+      if (imageInput) imageInput.value = '';
     }
   }
 
@@ -105,7 +101,7 @@ export class PublicacionesComponent implements OnInit {
     this.cargarPublicaciones();
   }
 
-  crearPublicacion(content: string, title?: string, description?: string) {
+  crearPublicacion(content: string, imagenes: File[] = []) {
     if (!content.trim()) return;
 
     const token = this.authService.getToken();
@@ -114,19 +110,28 @@ export class PublicacionesComponent implements OnInit {
       return;
     }
 
-    console.log('Creando publicación con:', { title, description, content });
+    const formData = new FormData();
+    formData.append('content', content);
 
-    // The server will attach user info from the JWT. Send title/description/content
-    const nueva: any = {
-      content,
-      date: new Date(),
-    };
-    if (title) nueva.title = title;
-    if (description) nueva.description = description;
-    
-    this.postsService.create(nueva).subscribe({
-      next: () => {
-        console.log('Publicación creada exitosamente');
+    this.postsService.create(formData).subscribe({
+      next: (publicacion) => {
+        console.log('Publicación creada exitosamente', publicacion);
+        // Subir imágenes una por una con convención <idPublicacion>:<idImagen>
+        if (publicacion && publicacion._id && imagenes.length > 0) {
+          imagenes.forEach((file, idx) => {
+            const imageForm = new FormData();
+            imageForm.append('file', file);
+            // El endpoint debe aceptar la imagen y guardarla como <idPublicacion>:<idImagen>
+            this.postsService.uploadImage(publicacion._id, imageForm, idx + 1).subscribe({
+              next: (res) => {
+                console.log('Imagen subida:', res);
+              },
+              error: (err) => {
+                console.error('Error al subir imagen:', err);
+              }
+            });
+          });
+        }
         this.cargarPublicaciones();
       },
       error: (err) => {

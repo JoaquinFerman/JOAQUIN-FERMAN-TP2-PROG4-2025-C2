@@ -1,0 +1,72 @@
+<div class="container" *ngIf="publicacion">
+  <div class="header">
+    <button class="btn-volver" (click)="volver()">← Volver</button>
+  </div>
+
+  <div class="publicacion-detalle">
+    <div class="publicacion-header">
+      <img [src]="publicacion.userProfileImage || '/assets/default-avatar.png'" class="avatar" alt="Avatar">
+      <div class="info">
+        <h3>{{ publicacion.userName || 'Usuario' }}</h3>
+        <span class="fecha">{{ publicacion.date | date:'short' }}</span>
+      </div>
+    </div>
+
+    <div class="publicacion-contenido">
+      <p>{{ publicacion.content }}</p>
+      <img *ngIf="publicacion.imageUrl" [src]="publicacion.imageUrl" class="imagen-publicacion" alt="Imagen de publicación">
+    </div>
+
+    <div class="publicacion-stats">
+      <span>❤️ {{ publicacion.likes?.length || 0 }} me gusta</span>
+      <span>💬 {{ publicacion.comments?.length || 0 }} comentarios</span>
+    </div>
+  </div>
+
+  <div class="comentarios-seccion">
+    <h3>Comentarios</h3>
+
+    <div class="comentarios-lista">
+      <div *ngFor="let comentario of comentarios" class="comentario">
+        <div class="comentario-header">
+          <img [src]="comentario.userProfileImage || '/assets/default-avatar.png'" class="avatar-pequeno" alt="Avatar">
+          <div class="comentario-info">
+            <strong>{{ comentario.userName }}</strong>
+            <span class="fecha-comentario">{{ comentario.date | date:'short' }}</span>
+            <span *ngIf="comentario.modified" class="modificado">(editado)</span>
+          </div>
+          <button 
+            *ngIf="isOwner(comentario) && editingCommentId !== comentario._id" 
+            class="btn-editar"
+            (click)="iniciarEdicion(comentario)">
+            Editar
+          </button>
+        </div>
+
+        <div class="comentario-contenido" *ngIf="editingCommentId !== comentario._id">
+          <p>{{ comentario.content }}</p>
+        </div>
+
+        <div class="comentario-edicion" *ngIf="editingCommentId === comentario._id">
+          <textarea 
+            [(ngModel)]="editingCommentContent" 
+            class="textarea-edicion"
+            rows="3">
+          </textarea>
+          <div class="botones-edicion">
+            <button class="btn-guardar" (click)="guardarEdicion(publicacion._id, comentario._id)">Guardar</button>
+            <button class="btn-cancelar" (click)="cancelarEdicion()">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cargar-mas" *ngIf="hasMore && !isLoading">
+      <button class="btn-cargar-mas" (click)="cargarMas()">Cargar más comentarios</button>
+    </div>
+
+    <div class="loading" *ngIf="isLoading">
+      <p>Cargando comentarios...</p>
+    </div>
+  </div>
+</div>

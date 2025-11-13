@@ -107,4 +107,43 @@ export class AuthService {
   async getProfile(userId: string) {
     return this.usuariosService.findOne(userId);
   }
+
+  async validarToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token);
+      const usuario = await this.usuariosService.findOne(payload.sub);
+      if (!usuario) {
+        throw new UnauthorizedException('Usuario no encontrado');
+      }
+      const { password, ...result } = (usuario as any).toObject();
+      return {
+        valid: true,
+        usuario: result
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Token inválido o expirado');
+    }
+  }
+
+  async refrescarToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token);
+      const usuario = await this.usuariosService.findOne(payload.sub);
+      if (!usuario) {
+        throw new UnauthorizedException('Usuario no encontrado');
+      }
+      const newPayload: JwtPayload = {
+        sub: usuario._id,
+        email: usuario.email,
+        nombreUsuario: usuario.nombreUsuario,
+        perfil: usuario.perfil,
+        imagenPerfil: usuario.imagenPerfil,
+      };
+      return {
+        access_token: this.jwtService.sign(newPayload, { expiresIn: '15m' })
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Token inválido o expirado');
+    }
+  }
 }

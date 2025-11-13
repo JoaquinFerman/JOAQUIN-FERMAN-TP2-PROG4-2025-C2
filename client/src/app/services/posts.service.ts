@@ -27,6 +27,9 @@ export class PostsService {
   }
 
   create(post: any): Observable<any> {
+    if (post instanceof FormData) {
+      return this.http.post<any>(this.apiUrl, post);
+    }
     return this.http.post<any>(this.apiUrl, post);
   }
 
@@ -63,5 +66,25 @@ export class PostsService {
       { userId },
       { headers: { 'Content-Type': 'application/json' } }
     );
+  }
+
+  uploadImage(postId: string, formData: FormData, imageIndex: number): Observable<any> {
+    // El backend debe aceptar la imagen y guardarla como <idPublicacion>:<idImagen>
+    // El endpoint puede ser /publicaciones/:id/upload-image
+    return this.http.post<any>(`${this.apiUrl}/${postId}/upload-image?imageIndex=${imageIndex}`, formData);
+  }
+
+  findOne(postId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${postId}`);
+  }
+
+  getCommentsPaginated(postId: string, page: number = 1, limit: number = 10): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${postId}/comments`, {
+      params: { page: page.toString(), limit: limit.toString() }
+    });
+  }
+
+  editComment(postId: string, commentId: string, content: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${postId}/comments/${commentId}/edit`, { content });
   }
 }
