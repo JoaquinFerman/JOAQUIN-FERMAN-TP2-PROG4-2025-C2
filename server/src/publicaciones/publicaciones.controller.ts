@@ -165,8 +165,8 @@ export class PublicacionesController {
     const path = `posts/${filename}`;
     const url = await this.supabaseService.uploadFile('publicaciones', path, file.buffer, file.mimetype as string);
 
-    // attach image url to the publication document
-    const updated = await this.publicacionesService.update(id, { imageUrl: url } as any);
+    // Add image URL to the images array
+    const updated = await this.publicacionesService.addImageToPost(id, url);
     return { imageUrl: url, filename, publication: updated };
   }
 

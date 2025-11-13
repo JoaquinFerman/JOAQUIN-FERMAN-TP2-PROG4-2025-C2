@@ -63,11 +63,34 @@
   line-height: 1.6;
 }
 
+.imagenes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
 .imagen-publicacion {
   width: 100%;
-  max-width: 600px;
+  height: auto;
+  max-height: 500px;
+  object-fit: cover;
   border-radius: 10px;
-  margin-top: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.imagen-publicacion:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.imagenes-grid:has(img:only-child) {
+  grid-template-columns: 1fr;
+}
+
+.imagenes-grid:has(img:only-child) .imagen-publicacion {
+  max-height: 600px;
 }
 
 .publicacion-stats {

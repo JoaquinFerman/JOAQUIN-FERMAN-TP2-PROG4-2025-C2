@@ -192,6 +192,22 @@ export class PublicacionesService {
       .exec();
   }
 
+  async addImageToPost(postId: string, imageUrl: string) {
+    const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
+    if (!post) throw new NotFoundException('Publicación no encontrada');
+    
+    // Inicializar el array si no existe
+    if (!post.images) {
+      (post as any).images = [];
+    }
+    
+    // Agregar la nueva URL al array
+    (post as any).images.push(imageUrl);
+    
+    await post.save();
+    return post;
+  }
+
   async getCommentsPaginated(postId: string, page: number = 1, limit: number = 10) {
     const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');

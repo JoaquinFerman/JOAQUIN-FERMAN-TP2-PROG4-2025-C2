@@ -62,8 +62,8 @@ export class Publicacione {
 	@Prop({ default: false })
 	liked: boolean;
 
-	@Prop()
-	imageUrl?: string;
+	@Prop({ type: [String], default: [] })
+	images: string[];
 
 	@Prop({ type: [String], default: [] })
 	likedUsers: string[];

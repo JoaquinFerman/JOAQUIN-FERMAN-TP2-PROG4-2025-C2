@@ -12,6 +12,13 @@
     </div>
     <div class="publicacion-contenido">
       <p>{{data.content}}</p>
+      @if (data.images && data.images.length > 0) {
+        <div class="imagenes-grid">
+          @for (imagen of data.images; track imagen) {
+            <img [src]="imagen" alt="Imagen de publicación" class="imagen-publicacion">
+          }
+        </div>
+      }
     </div>
     <div class="publicacion-footer">
       @if (data.liked === true) {
