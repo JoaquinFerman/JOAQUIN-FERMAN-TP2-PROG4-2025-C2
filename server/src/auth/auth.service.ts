@@ -133,7 +133,7 @@ export class AuthService {
         throw new UnauthorizedException('Usuario no encontrado');
       }
       const newPayload: JwtPayload = {
-        sub: usuario._id,
+        sub: (usuario as any)._id || (usuario as any).id,
         email: usuario.email,
         nombreUsuario: usuario.nombreUsuario,
         perfil: usuario.perfil,

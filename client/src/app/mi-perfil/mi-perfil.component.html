@@ -124,3 +124,53 @@
     </div>
   </div>
 }
+
+<!-- Modal de publicación expandida -->
+@if (publicacionExpandida) {
+  <div class="modal-publicacion-overlay" (click)="cerrarPublicacionExpandida()">
+    <div class="modal-publicacion-card" (click)="$event.stopPropagation()">
+      <button class="btn-cerrar-publicacion" (click)="cerrarPublicacionExpandida()">✕</button>
+      
+      <div class="publicacion-expandida-header">
+        <img [src]="publicacionExpandida.userPhoto || '/assets/default-avatar.png'" class="avatar-expandido" alt="Avatar">
+        <div class="info-expandida">
+          <h3>{{ publicacionExpandida.userName }}</h3>
+          <span class="fecha-expandida">{{ publicacionExpandida.date | date:'short' }}</span>
+        </div>
+      </div>
+
+      <div class="publicacion-expandida-contenido">
+        <p>{{ publicacionExpandida.content }}</p>
+        @if (publicacionExpandida.images && publicacionExpandida.images.length > 0) {
+          <div class="imagenes-expandidas">
+            @for (imagen of publicacionExpandida.images; track imagen) {
+              <img [src]="imagen" alt="Imagen" class="imagen-expandida">
+            }
+          </div>
+        }
+      </div>
+
+      <div class="publicacion-expandida-stats">
+        <span>❤️ {{ publicacionExpandida.likesCount || 0 }} me gusta</span>
+        <span>💬 {{ publicacionExpandida.comments?.length || 0 }} comentarios</span>
+      </div>
+
+      <div class="comentarios-expandidos">
+        <h4>Comentarios</h4>
+        @if (publicacionExpandida.comments && publicacionExpandida.comments.length > 0) {
+          <div class="lista-comentarios-expandida">
+            @for (comentario of publicacionExpandida.comments; track comentario) {
+              <div class="comentario-expandido">
+                <strong>{{ comentario.userName }}</strong>
+                <p>{{ comentario.content }}</p>
+                <small>{{ comentario.date | date:'short' }}</small>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="sin-comentarios">No hay comentarios aún</p>
+        }
+      </div>
+    </div>
+  </div>
+}

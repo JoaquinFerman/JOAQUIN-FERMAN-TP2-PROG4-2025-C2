@@ -162,8 +162,17 @@ export class MiPerfilComponent {
     return this.misPublicaciones.length;
   }
 
+  publicacionExpandida: any = null;
+
   verPublicacion(publicacionId: string) {
-    // Navegar a la vista detallada de la publicación
-    window.location.href = `/publicaciones/${publicacionId}`;
+    // Encontrar y mostrar la publicación en modal
+    const publicacion = this.misPublicaciones.find(p => (p._id || p.id) === publicacionId);
+    if (publicacion) {
+      this.publicacionExpandida = publicacion;
+    }
+  }
+
+  cerrarPublicacionExpandida() {
+    this.publicacionExpandida = null;
   }
 }
