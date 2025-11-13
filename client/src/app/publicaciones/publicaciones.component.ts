@@ -118,6 +118,7 @@ export class PublicacionesComponent implements OnInit {
         console.log('Publicación creada exitosamente', publicacion);
         // Subir imágenes una por una con convención <idPublicacion>:<idImagen>
         if (publicacion && publicacion._id && imagenes.length > 0) {
+          let imagenesSubidas = 0;
           imagenes.forEach((file, idx) => {
             const imageForm = new FormData();
             imageForm.append('file', file);
@@ -125,14 +126,26 @@ export class PublicacionesComponent implements OnInit {
             this.postsService.uploadImage(publicacion._id, imageForm, idx + 1).subscribe({
               next: (res) => {
                 console.log('Imagen subida:', res);
+                imagenesSubidas++;
+                // Recargar solo cuando todas las imágenes estén subidas
+                if (imagenesSubidas === imagenes.length) {
+                  this.cargarPublicaciones();
+                }
               },
               error: (err) => {
                 console.error('Error al subir imagen:', err);
+                imagenesSubidas++;
+                // Recargar incluso si hubo errores
+                if (imagenesSubidas === imagenes.length) {
+                  this.cargarPublicaciones();
+                }
               }
             });
           });
+        } else {
+          // Si no hay imágenes, recargar inmediatamente
+          this.cargarPublicaciones();
         }
-        this.cargarPublicaciones();
       },
       error: (err) => {
         console.error('Error al crear publicación:', err);

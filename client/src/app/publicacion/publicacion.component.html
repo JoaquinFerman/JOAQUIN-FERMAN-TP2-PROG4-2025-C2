@@ -15,7 +15,7 @@
       @if (data.images && data.images.length > 0) {
         <div class="imagenes-grid">
           @for (imagen of data.images; track imagen) {
-            <div class="imagen-container">
+            <div class="imagen-container" (click)="verImagenCompleta(imagen)">
               <img [src]="imagen" alt="Imagen de publicación" class="imagen-publicacion" (load)="onImageLoad($event)" (error)="onImageError($event)">
               <div class="imagen-loading">
                 <div class="spinner"></div>

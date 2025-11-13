@@ -209,4 +209,21 @@ export class MiPerfilComponent {
       img.style.display = 'none';
     }
   }
+
+  verImagenCompleta(imagenUrl: string) {
+    // Crear modal para ver imagen completa
+    const modal = document.createElement('div');
+    modal.className = 'modal-imagen-completa';
+    modal.innerHTML = `
+      <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; cursor: pointer;">
+        <img src="${imagenUrl}" style="max-width: 90%; max-height: 90vh; object-fit: contain; border-radius: 8px;" alt="Imagen completa">
+      </div>
+    `;
+    
+    modal.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+    
+    document.body.appendChild(modal);
+  }
 }
