@@ -82,6 +82,12 @@ export class PublicacionComponent {
     }
   }
 
+  isMyPost(): boolean {
+    const userId = this.getUserId();
+    if (!userId || !this.data) return false;
+    return String(this.data.userId) === String(userId);
+  }
+
   deletePost() {
     this.postsService.delete(this.data._id).subscribe(() => {
       this.data.deleted = true;

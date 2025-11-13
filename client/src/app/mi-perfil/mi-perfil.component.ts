@@ -147,6 +147,23 @@ export class MiPerfilComponent {
   }
 
   get ultimosTresPosts() {
-    return this.publicaciones.slice(0, 3);
+    return this.misPublicaciones.slice(0, 3);
+  }
+
+  get misPublicaciones() {
+    const userId = this.usuario?.id || this.usuario?._id;
+    if (!userId) return [];
+    return this.publicaciones.filter(pub => 
+      String(pub.userId) === String(userId)
+    );
+  }
+
+  get cantidadPublicaciones() {
+    return this.misPublicaciones.length;
+  }
+
+  verPublicacion(publicacionId: string) {
+    // Navegar a la vista detallada de la publicación
+    window.location.href = `/publicaciones/${publicacionId}`;
   }
 }

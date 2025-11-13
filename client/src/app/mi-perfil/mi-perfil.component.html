@@ -94,13 +94,23 @@
         </div>
       }
 
+      <!-- Estadísticas -->
+      @if (!editMode) {
+        <div class="estadisticas">
+          <div class="stat-item">
+            <span class="stat-numero">{{ cantidadPublicaciones }}</span>
+            <span class="stat-label">Publicaciones</span>
+          </div>
+        </div>
+      }
+
       <!-- Publicaciones recientes (compactas) -->
       @if (!editMode && ultimosTresPosts.length > 0) {
         <div class="publicaciones-recientes">
           <h3>Publicaciones recientes</h3>
           <div class="posts-grid">
             @for (pub of ultimosTresPosts; track pub._id || pub.id) {
-              <div class="post-mini">
+              <div class="post-mini" (click)="verPublicacion(pub._id || pub.id)" style="cursor: pointer;">
                 <p class="post-content">{{ pub.content }}</p>
                 <div class="post-stats">
                   <span>❤️ {{ pub.likesCount || 0 }}</span>

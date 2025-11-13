@@ -6,7 +6,7 @@
       }
       <span class="usuario-nombre">{{data.userName}}</span>
       <span class="fecha">{{data.date | date:'short'}} </span>
-      @if (data.isOwn === true) {
+      @if (isMyPost()) {
         <button (click)="deletePost()">Eliminar</button>
       }
     </div>
