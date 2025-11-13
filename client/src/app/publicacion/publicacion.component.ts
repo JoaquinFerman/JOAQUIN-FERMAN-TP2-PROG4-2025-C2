@@ -163,14 +163,23 @@ export class PublicacionComponent {
 
   onImageError(event: Event) {
     const img = event.target as HTMLImageElement;
-    const container = img.parentElement;
-    if (container) {
-      const loader = container.querySelector('.imagen-loading') as HTMLElement;
-      if (loader) {
-        loader.style.display = 'none';
+    const originalSrc = img.src;
+    const retryCount = parseInt(img.getAttribute('data-retry') || '0');
+    
+    if (retryCount < 10) { // Máximo 10 reintentos (50 segundos)
+      img.setAttribute('data-retry', (retryCount + 1).toString());
+      setTimeout(() => {
+        img.src = originalSrc + '?retry=' + Date.now();
+      }, 5000);
+    } else {
+      const container = img.parentElement;
+      if (container) {
+        const loader = container.querySelector('.imagen-loading') as HTMLElement;
+        if (loader) {
+          loader.innerHTML = '<span style="color: #999;">Error al cargar imagen</span>';
+        }
       }
+      img.style.display = 'none';
     }
-    img.src = '/assets/image-error.png';
-    img.style.opacity = '1';
   }
 }
