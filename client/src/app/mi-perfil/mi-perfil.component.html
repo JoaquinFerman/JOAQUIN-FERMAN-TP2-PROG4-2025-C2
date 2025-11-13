@@ -144,7 +144,12 @@
         @if (publicacionExpandida.images && publicacionExpandida.images.length > 0) {
           <div class="imagenes-expandidas">
             @for (imagen of publicacionExpandida.images; track imagen) {
-              <img [src]="imagen" alt="Imagen" class="imagen-expandida">
+              <div class="imagen-container">
+                <img [src]="imagen" alt="Imagen" class="imagen-expandida" (load)="onImageLoad($event)" (error)="onImageError($event)">
+                <div class="imagen-loading">
+                  <div class="spinner"></div>
+                </div>
+              </div>
             }
           </div>
         }

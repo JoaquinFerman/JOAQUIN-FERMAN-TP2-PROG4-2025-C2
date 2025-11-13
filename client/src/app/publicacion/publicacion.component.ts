@@ -148,4 +148,29 @@ export class PublicacionComponent {
     console.log('Cargando más comentarios...');
     // Lógica para cargar más comentarios
   }
+
+  onImageLoad(event: Event) {
+    const img = event.target as HTMLImageElement;
+    const container = img.parentElement;
+    if (container) {
+      const loader = container.querySelector('.imagen-loading') as HTMLElement;
+      if (loader) {
+        loader.style.display = 'none';
+      }
+      img.style.opacity = '1';
+    }
+  }
+
+  onImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    const container = img.parentElement;
+    if (container) {
+      const loader = container.querySelector('.imagen-loading') as HTMLElement;
+      if (loader) {
+        loader.style.display = 'none';
+      }
+    }
+    img.src = '/assets/image-error.png';
+    img.style.opacity = '1';
+  }
 }

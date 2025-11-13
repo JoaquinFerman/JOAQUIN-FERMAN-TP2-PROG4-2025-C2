@@ -89,28 +89,61 @@
   margin-top: 1rem;
 }
 
+.imagen-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background: #f0f0f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .imagen-publicacion {
   width: 100%;
-  height: auto;
-  max-height: 400px;
+  height: 100%;
   object-fit: cover;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
 }
 
 .imagen-publicacion:hover {
   transform: scale(1.02);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.imagen-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f9fa;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Si solo hay una imagen, ocupar todo el ancho */
-.imagenes-grid:has(img:only-child) {
+.imagenes-grid:has(.imagen-container:only-child) {
   grid-template-columns: 1fr;
 }
 
-.imagenes-grid:has(img:only-child) .imagen-publicacion {
-  max-height: 500px;
+.imagenes-grid:has(.imagen-container:only-child) .imagen-container {
+  height: 400px;
 }
 
 .publicacion-footer {
