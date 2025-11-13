@@ -110,10 +110,10 @@ export class PublicacionesComponent implements OnInit {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('content', content);
+    // Enviar como objeto JSON, no FormData
+    const publicacionData = { content: content.trim() };
 
-    this.postsService.create(formData).subscribe({
+    this.postsService.create(publicacionData).subscribe({
       next: (publicacion) => {
         console.log('Publicación creada exitosamente', publicacion);
         // Subir imágenes una por una con convención <idPublicacion>:<idImagen>
