@@ -34,11 +34,11 @@ export class App implements OnInit {
   }
 
   onExtenderSesion() {
-    const token = localStorage.getItem('access_token');
+    const token = this.authService.getToken();
     if (token) {
       this.authService.refrescarToken(token).subscribe({
         next: (response) => {
-          localStorage.setItem('access_token', response.access_token);
+          this.authService.setToken(response.access_token);
           this.sessionService.reiniciarContador();
           this.showSessionModal = false;
         },

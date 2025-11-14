@@ -184,6 +184,7 @@ export class PublicacionComponent {
   }
 
   verImagenCompleta(imagenUrl: string) {
+    event?.stopPropagation();
     // Crear modal para ver imagen completa
     const modal = document.createElement('div');
     modal.className = 'modal-imagen-completa';
@@ -198,5 +199,12 @@ export class PublicacionComponent {
     });
     
     document.body.appendChild(modal);
+  }
+
+  verDetalle() {
+    const id = this.data._id || this.data.id;
+    if (id) {
+      window.location.href = `/publicaciones/${id}`;
+    }
   }
 }

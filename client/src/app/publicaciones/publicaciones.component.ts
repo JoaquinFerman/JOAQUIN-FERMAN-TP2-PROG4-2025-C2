@@ -19,6 +19,7 @@ export class PublicacionesComponent implements OnInit {
   publicacionesPorPagina = 5;
   usuario: any = null;
   mostrarPerfil = false;
+  cargando = true;
   onCrearPublicacion(event: Event) {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
@@ -68,30 +69,38 @@ export class PublicacionesComponent implements OnInit {
   }
 
   cargarPublicaciones() {
+    this.cargando = true;
     // Use server-side pagination when possible
     const offset = (this.paginaActual - 1) * this.publicacionesPorPagina;
     const limit = this.publicacionesPorPagina;
     const currentUserId = this.usuario?.id;
-    this.postsService.getAllPaginated({ order: this.orden, offset, limit, currentUserId }).subscribe(res => {
-      // Server returns either { total, posts } when paginated or an array (legacy)
-      if (res && res.posts) {
-        this.publicaciones = res.posts;
-        this.totalPaginas = Math.ceil(res.total / this.publicacionesPorPagina) || 1;
-      } else if (Array.isArray(res)) {
-        let orderedPosts = [...res];
-        if (this.orden === 'fecha') {
-          orderedPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    this.postsService.getAllPaginated({ order: this.orden, offset, limit, currentUserId }).subscribe({
+      next: (res) => {
+        // Server returns either { total, posts } when paginated or an array (legacy)
+        if (res && res.posts) {
+          this.publicaciones = res.posts;
+          this.totalPaginas = Math.ceil(res.total / this.publicacionesPorPagina) || 1;
+        } else if (Array.isArray(res)) {
+          let orderedPosts = [...res];
+          if (this.orden === 'fecha') {
+            orderedPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          } else {
+            orderedPosts.sort((a, b) => b.likesCount - a.likesCount);
+          }
+          this.totalPaginas = Math.ceil(orderedPosts.length / this.publicacionesPorPagina);
+          const start = (this.paginaActual - 1) * this.publicacionesPorPagina;
+          const end = start + this.publicacionesPorPagina;
+          this.publicaciones = orderedPosts.slice(start, end);
         } else {
-          orderedPosts.sort((a, b) => b.likesCount - a.likesCount);
+          // fallback
+          this.publicaciones = res || [];
+          this.totalPaginas = 1;
         }
-        this.totalPaginas = Math.ceil(orderedPosts.length / this.publicacionesPorPagina);
-        const start = (this.paginaActual - 1) * this.publicacionesPorPagina;
-        const end = start + this.publicacionesPorPagina;
-        this.publicaciones = orderedPosts.slice(start, end);
-      } else {
-        // fallback
-        this.publicaciones = res || [];
-        this.totalPaginas = 1;
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar publicaciones:', err);
+        this.cargando = false;
       }
     });
   }

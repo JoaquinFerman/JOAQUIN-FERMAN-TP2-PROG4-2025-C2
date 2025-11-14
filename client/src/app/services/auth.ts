@@ -27,11 +27,10 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('token');
-    localStorage.removeItem('access_token');
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('access_token');
+    return !!localStorage.getItem('token');
   }
 
   validarToken(token: string): Observable<any> {

@@ -20,11 +20,19 @@
     <button (click)="cambiarOrden('fecha')" [class.active]="orden === 'fecha'">Por fecha</button>
     <button (click)="cambiarOrden('meGusta')" [class.active]="orden === 'meGusta'">Por me gusta</button>
   </div>
-  <div class="listado-publicaciones">
-    @for (publicacion of publicaciones; track publicacion) {
-      <app-publicacion [data]="publicacion"></app-publicacion>
-    }
-  </div>
+  
+  @if (cargando) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Cargando publicaciones...</p>
+    </div>
+  } @else {
+    <div class="listado-publicaciones">
+      @for (publicacion of publicaciones; track publicacion) {
+        <app-publicacion [data]="publicacion"></app-publicacion>
+      }
+    </div>
+  }
   <div class="paginacion">
     <button (click)="cambiarPagina(paginaActual - 1)" [disabled]="paginaActual === 1">Anterior</button>
     <span>Página {{paginaActual}} de {{totalPaginas}}</span>

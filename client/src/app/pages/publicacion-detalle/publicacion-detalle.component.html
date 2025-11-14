@@ -16,9 +16,11 @@
       <div class="publicacion-contenido">
         <p>{{ publicacion.content }}</p>
         @if (publicacion.images && publicacion.images.length > 0) {
-          <div class="imagenes-grid">
+          <div class="imagenes-grandes">
             @for (imagen of publicacion.images; track imagen) {
-              <img [src]="imagen" class="imagen-publicacion" alt="Imagen de publicación">
+              <div class="imagen-wrapper">
+                <img [src]="imagen" class="imagen-grande" alt="Imagen de publicación" (click)="verImagenCompleta(imagen)">
+              </div>
             }
           </div>
         }
@@ -41,9 +43,7 @@
               <div class="comentario-info">
                 <strong>{{ comentario.userName }}</strong>
                 <span class="fecha-comentario">{{ comentario.date | date:'short' }}</span>
-                @if (comentario.modified) {
-                  <span class="modificado">(editado)</span>
-                }
+
               </div>
               @if (isOwner(comentario) && editingCommentId !== comentario._id) {
                 <button class="btn-editar" (click)="iniciarEdicion(comentario)">
@@ -54,7 +54,7 @@
 
             @if (editingCommentId !== comentario._id) {
               <div class="comentario-contenido">
-                <p>{{ comentario.content }}</p>
+                <p>{{ comentario.content }}@if (comentario.modified) { <span class="modificado"> [editado]</span>}</p>
               </div>
             }
 

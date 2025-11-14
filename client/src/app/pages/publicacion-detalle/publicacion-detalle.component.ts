@@ -109,7 +109,30 @@ export class PublicacionDetalleComponent implements OnInit {
   }
 
   isOwner(comment: any): boolean {
-    const userId = localStorage.getItem('userId');
-    return comment.userId === userId;
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const userId = payload.sub || payload.id;
+      return String(comment.userId) === String(userId);
+    } catch {
+      return false;
+    }
+  }
+
+  verImagenCompleta(imagenUrl: string) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-imagen-completa';
+    modal.innerHTML = `
+      <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 9999; cursor: pointer; padding: 2rem;">
+        <img src="${imagenUrl}" style="max-width: 95%; max-height: 95vh; object-fit: contain; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);" alt="Imagen completa">
+      </div>
+    `;
+    
+    modal.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+    
+    document.body.appendChild(modal);
   }
 }

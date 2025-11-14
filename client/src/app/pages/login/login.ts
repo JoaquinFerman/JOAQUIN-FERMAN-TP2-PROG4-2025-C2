@@ -56,7 +56,6 @@ export class LoginComponent {
           this.isLoading = false;
           if (res && res.access_token) {            
             this.authService.setToken(res.access_token);
-            localStorage.setItem('access_token', res.access_token);
             this.sessionService.iniciarContador(); // Iniciar contador de sesión
             this.successMsg = '¡Login exitoso!';
             setTimeout(() => {

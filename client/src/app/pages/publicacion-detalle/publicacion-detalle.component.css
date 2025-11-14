@@ -63,34 +63,34 @@
   line-height: 1.6;
 }
 
-.imagenes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
+.imagenes-grandes {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.imagen-publicacion {
+.imagen-wrapper {
   width: 100%;
-  height: auto;
-  max-height: 500px;
-  object-fit: cover;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
   transition: transform 0.3s ease;
 }
 
-.imagen-publicacion:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.imagen-wrapper:hover {
+  transform: scale(1.01);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.imagenes-grid:has(img:only-child) {
-  grid-template-columns: 1fr;
-}
-
-.imagenes-grid:has(img:only-child) .imagen-publicacion {
+.imagen-grande {
+  width: 100%;
   max-height: 600px;
+  object-fit: contain;
+  border-radius: 12px;
 }
 
 .publicacion-stats {
@@ -158,9 +158,9 @@
 
 .modificado {
   color: #999;
-  font-size: 11px;
+  font-size: 0.85em;
   font-style: italic;
-  margin-left: 5px;
+  font-weight: normal;
 }
 
 .btn-editar {
