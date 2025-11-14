@@ -71,7 +71,8 @@ export class PublicacionesComponent implements OnInit {
     // Use server-side pagination when possible
     const offset = (this.paginaActual - 1) * this.publicacionesPorPagina;
     const limit = this.publicacionesPorPagina;
-    this.postsService.getAllPaginated({ order: this.orden, offset, limit }).subscribe(res => {
+    const currentUserId = this.usuario?.id;
+    this.postsService.getAllPaginated({ order: this.orden, offset, limit, currentUserId }).subscribe(res => {
       // Server returns either { total, posts } when paginated or an array (legacy)
       if (res && res.posts) {
         this.publicaciones = res.posts;

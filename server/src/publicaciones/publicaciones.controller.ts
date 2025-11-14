@@ -65,12 +65,14 @@ export class PublicacionesController {
     @Query('userId') userId?: string,
     @Query('offset') offset?: string,
     @Query('limit') limit?: string,
+    @Query('currentUserId') currentUserId?: string,
   ) {
     const opts: any = {};
     if (order) opts.order = order;
     if (userId) opts.userId = userId;
     if (offset) opts.offset = Number(offset);
     if (limit) opts.limit = Number(limit);
+    if (currentUserId) opts.currentUserId = currentUserId;
     return this.publicacionesService.findAll(opts);
   }
 

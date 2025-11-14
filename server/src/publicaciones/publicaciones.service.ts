@@ -38,7 +38,7 @@ export class PublicacionesService {
     }
   }
 
-  async findAll(options?: { order?: 'fecha' | 'meGusta'; userId?: string; offset?: number; limit?: number }) {
+  async findAll(options?: { order?: 'fecha' | 'meGusta'; userId?: string; offset?: number; limit?: number; currentUserId?: string }) {
     const filter: any = { deleted: { $ne: true } };
     if (options?.userId) filter.userId = String(options.userId);
 
@@ -59,7 +59,17 @@ export class PublicacionesService {
       query = query.limit(options.limit);
     }
 
-    const posts = await query.exec();
+    let posts = await query.exec();
+
+    // Add 'liked' property based on currentUserId
+    if (options?.currentUserId) {
+      const currentUserId = options.currentUserId;
+      posts = posts.map(post => {
+        const postObj = post.toObject();
+        postObj.liked = postObj.likedUsers?.includes(currentUserId) || false;
+        return postObj;
+      }) as any;
+    }
 
     if (typeof options?.limit === 'number' && options.limit > 0) {
       const total = await this.publicacioneModel.countDocuments(filter).exec();

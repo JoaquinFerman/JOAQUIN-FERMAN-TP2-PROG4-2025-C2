@@ -64,6 +64,14 @@
           }
         </div>
 
+        <!-- Estadísticas -->
+        <div class="estadisticas">
+          <div class="stat-item">
+            <span class="stat-numero">{{ cantidadPublicaciones }}</span>
+            <span class="stat-label">Publicaciones</span>
+          </div>
+        </div>
+
         <div class="acciones">
           <button class="btn-editar" (click)="editar()">Editar perfil</button>
           <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
@@ -90,16 +98,6 @@
           <div class="acciones-edicion">
             <button class="btn-cancelar" (click)="cancelarEdicion()">Cancelar</button>
             <button class="btn-guardar" (click)="guardarEdicion()">Guardar cambios</button>
-          </div>
-        </div>
-      }
-
-      <!-- Estadísticas -->
-      @if (!editMode) {
-        <div class="estadisticas">
-          <div class="stat-item">
-            <span class="stat-numero">{{ cantidadPublicaciones }}</span>
-            <span class="stat-label">Publicaciones</span>
           </div>
         </div>
       }
