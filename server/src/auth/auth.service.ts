@@ -75,7 +75,6 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const usuario = await this.validateUser(loginDto.emailOrUsername, loginDto.password);
-    
     if (!usuario) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
@@ -84,8 +83,7 @@ export class AuthService {
     if (!usuario.activo) {
       throw new UnauthorizedException('Tu cuenta ha sido deshabilitada. Contacta al administrador.');
     }
-    
-    
+
     const payload: JwtPayload = {
       sub: usuario._id,
       email: usuario.email,
@@ -93,7 +91,7 @@ export class AuthService {
       perfil: usuario.perfil,
       imagenPerfil: usuario.imagenPerfil,
     };
-        
+
     return {
       access_token: this.jwtService.sign(payload),
       usuario: {

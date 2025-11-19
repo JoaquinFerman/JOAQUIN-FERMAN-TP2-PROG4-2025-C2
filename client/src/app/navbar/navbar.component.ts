@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth';
 })
 export class NavbarComponent {
   menuAbierto = false;
+  dashboardAbierto = false;
 
   constructor(
     public authService: AuthService,
@@ -20,6 +21,10 @@ export class NavbarComponent {
 
   toggleMenu() {
     this.menuAbierto = !this.menuAbierto;
+  }
+
+  toggleDashboard() {
+    this.dashboardAbierto = !this.dashboardAbierto;
   }
 
   cerrarSesion() {

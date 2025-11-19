@@ -14,12 +14,12 @@ export class SessionService {
     this.detenerContador();
     this.warningShown = false;
     
-    // Contador de 10 minutos (600000 ms)
+    // Contador - mostrar advertencia a los 12 minutos, cerrar a los 15
     const timerSubscription = interval(1000).subscribe((secondsElapsed) => {
       const minutesElapsed = Math.floor(secondsElapsed / 60);
       
-      // A los 10 minutos, mostrar el modal de advertencia
-      if (minutesElapsed >= 10 && !this.warningShown) {
+      // A los 12 minutos (3 minutos antes de expirar), mostrar el modal de advertencia
+      if (minutesElapsed >= 12 && !this.warningShown) {
         this.warningShown = true;
         this.showWarningModal.next(true);
       }

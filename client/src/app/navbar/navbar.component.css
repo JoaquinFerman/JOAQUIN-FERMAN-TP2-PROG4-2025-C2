@@ -80,9 +80,10 @@
   min-width: 180px;
   margin-top: 0.5rem;
   overflow: hidden;
+  z-index: 1000;
 }
 
-.dropdown:hover .dropdown-menu {
+.dropdown-menu.show {
   display: block;
 }
 

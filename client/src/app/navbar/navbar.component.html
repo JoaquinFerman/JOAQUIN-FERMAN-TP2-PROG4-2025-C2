@@ -13,13 +13,13 @@
         <a routerLink="/publicaciones" class="nav-link">Publicaciones</a>
         
         @if (authService.isAdmin()) {
-          <div class="dropdown">
-            <button class="nav-link dropdown-toggle">
+          <div class="dropdown" [class.active]="dashboardAbierto">
+            <button class="nav-link dropdown-toggle" (click)="toggleDashboard()">
               Dashboard ▼
             </button>
-            <div class="dropdown-menu">
-              <a routerLink="/dashboard/usuarios" class="dropdown-item">Usuarios</a>
-              <a routerLink="/dashboard/estadisticas" class="dropdown-item">Estadísticas</a>
+            <div class="dropdown-menu" [class.show]="dashboardAbierto">
+              <a routerLink="/dashboard/usuarios" class="dropdown-item" (click)="dashboardAbierto = false">Usuarios</a>
+              <a routerLink="/dashboard/estadisticas" class="dropdown-item" (click)="dashboardAbierto = false">Estadísticas</a>
             </div>
           </div>
         }

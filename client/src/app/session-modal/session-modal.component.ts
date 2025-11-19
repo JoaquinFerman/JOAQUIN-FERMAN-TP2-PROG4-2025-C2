@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
     <div class="modal-overlay">
       <div class="modal-content">
         <h2>⚠️ Sesión por expirar</h2>
-        <p>Tu sesión expirará en 5 minutos.</p>
+        <p>Tu sesión expirará en 3 minutos.</p>
         <p>¿Deseas extender tu sesión?</p>
         <div class="modal-buttons">
           <button class="btn-primary" (click)="onExtender()">Sí, extender sesión</button>
