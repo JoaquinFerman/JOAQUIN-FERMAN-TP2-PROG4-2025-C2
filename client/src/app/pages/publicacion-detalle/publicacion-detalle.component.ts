@@ -1,3 +1,4 @@
+  // Se elimina getImagenUrl, se usa la url tal como viene del backend
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,6 +20,13 @@ export class PublicacionDetalleComponent implements OnInit {
   isLoading = false;
   editingCommentId: string | null = null;
   editingCommentContent: string = '';
+
+  getImagenUrl(imagen: string): string {
+    if (!imagen) return '';
+    if (imagen.startsWith('http')) return imagen;
+    // Si la imagen es relativa, la completamos con la URL base
+    return `https://tp-integrador-server-production.up.railway.app/uploads/${imagen}`;
+  }
 
   constructor(
     private route: ActivatedRoute,

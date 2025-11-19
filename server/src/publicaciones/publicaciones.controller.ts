@@ -89,6 +89,7 @@ export class PublicacionesController {
       id: user.sub || user.id || user._id,
       nombreUsuario: user.nombreUsuario || user.nombre,
       nombre: user.nombre || user.nombreUsuario,
+      perfil: user.perfil || 'usuario',
       roles: user.roles || [],
     };
     return this.publicacionesService.remove(id, userPayload as any);

@@ -207,4 +207,8 @@ export class PublicacionComponent {
       window.location.href = `/publicaciones/${id}`;
     }
   }
+
+  isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
 }

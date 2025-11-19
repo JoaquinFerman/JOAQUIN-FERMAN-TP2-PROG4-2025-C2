@@ -6,7 +6,7 @@
 
     <div class="publicacion-detalle">
       <div class="publicacion-header">
-        <img [src]="publicacion.userProfileImage || '/assets/default-avatar.png'" class="avatar" alt="Avatar">
+        <img [src]="publicacion.userPhoto || '/assets/default-avatar.png'" class="avatar" alt="Avatar">
         <div class="info">
           <h3>{{ publicacion.userName || 'Usuario' }}</h3>
           <span class="fecha">{{ publicacion.date | date:'short' }}</span>
@@ -39,7 +39,7 @@
         @for (comentario of comentarios; track comentario._id) {
           <div class="comentario">
             <div class="comentario-header">
-              <img [src]="comentario.userProfileImage || '/assets/default-avatar.png'" class="avatar-pequeno" alt="Avatar">
+              <img [src]="comentario.userPhoto || '/assets/default-avatar.png'" class="avatar-pequeno" alt="Avatar">
               <div class="comentario-info">
                 <strong>{{ comentario.userName }}</strong>
                 <span class="fecha-comentario">{{ comentario.date | date:'short' }}</span>

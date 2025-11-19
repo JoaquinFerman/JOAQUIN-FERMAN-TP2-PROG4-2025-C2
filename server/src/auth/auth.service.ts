@@ -79,6 +79,11 @@ export class AuthService {
     if (!usuario) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
+
+    // Verificar si el usuario está activo
+    if (!usuario.activo) {
+      throw new UnauthorizedException('Tu cuenta ha sido deshabilitada. Contacta al administrador.');
+    }
     
     
     const payload: JwtPayload = {

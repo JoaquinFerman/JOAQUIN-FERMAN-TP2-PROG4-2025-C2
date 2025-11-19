@@ -6,8 +6,8 @@
       }
       <span class="usuario-nombre">{{data.userName}}</span>
       <span class="fecha">{{data.date | date:'short'}} </span>
-      @if (isMyPost()) {
-        <button (click)="deletePost(); $event.stopPropagation()">Eliminar</button>
+      @if (isMyPost() || isAdmin()) {
+        <button (click)="deletePost(); $event.stopPropagation()" class="btn-eliminar">Eliminar</button>
       }
     </div>
     <div class="publicacion-contenido">

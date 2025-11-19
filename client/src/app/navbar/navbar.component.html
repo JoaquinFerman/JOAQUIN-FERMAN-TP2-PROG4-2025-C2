@@ -1,0 +1,37 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <a routerLink="/publicaciones">Red Social</a>
+    </div>
+
+    <button class="menu-toggle" (click)="toggleMenu()">
+      ☰
+    </button>
+
+    <div class="navbar-menu" [class.active]="menuAbierto">
+      @if (authService.isLoggedIn()) {
+        <a routerLink="/publicaciones" class="nav-link">Publicaciones</a>
+        
+        @if (authService.isAdmin()) {
+          <div class="dropdown">
+            <button class="nav-link dropdown-toggle">
+              Dashboard ▼
+            </button>
+            <div class="dropdown-menu">
+              <a routerLink="/dashboard/usuarios" class="dropdown-item">Usuarios</a>
+              <a routerLink="/dashboard/estadisticas" class="dropdown-item">Estadísticas</a>
+            </div>
+          </div>
+        }
+
+        <div class="navbar-user">
+          <span class="user-name">{{ getUserProfile()?.nombreUsuario }}</span>
+          @if (authService.isAdmin()) {
+            <span class="badge-admin">Admin</span>
+          }
+          <button class="btn-logout" (click)="cerrarSesion()">Salir</button>
+        </div>
+      }
+    </div>
+  </div>
+</nav>

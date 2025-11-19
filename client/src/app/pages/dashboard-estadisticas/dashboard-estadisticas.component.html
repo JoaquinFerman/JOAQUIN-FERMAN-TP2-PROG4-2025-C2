@@ -1,0 +1,38 @@
+<div class="dashboard-container">
+  <h1>Estadísticas de la Red Social</h1>
+
+  <div class="filtros">
+    <div class="form-group">
+      <label>Fecha Inicio:</label>
+      <input type="date" [(ngModel)]="fechaInicio" name="fechaInicio">
+    </div>
+    <div class="form-group">
+      <label>Fecha Fin:</label>
+      <input type="date" [(ngModel)]="fechaFin" name="fechaFin">
+    </div>
+    <button class="btn-filtrar" (click)="aplicarFiltro()">Aplicar Filtro</button>
+  </div>
+
+  @if (cargando) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Cargando estadísticas...</p>
+    </div>
+  }
+
+  @if (!cargando) {
+    <div class="graficos-grid">
+      <div class="grafico-card">
+        <canvas id="chartPublicaciones"></canvas>
+      </div>
+
+      <div class="grafico-card">
+        <canvas id="chartComentariosTotales"></canvas>
+      </div>
+
+      <div class="grafico-card grafico-pie">
+        <canvas id="chartComentariosPorPublicacion"></canvas>
+      </div>
+    </div>
+  }
+</div>

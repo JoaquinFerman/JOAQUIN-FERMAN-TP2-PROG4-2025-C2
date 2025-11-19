@@ -69,6 +69,12 @@ export class UsuariosService {
       .exec();
   }
 
+  async findAllIncludingInactive(): Promise<Usuario[]> {
+    return this.usuarioModel.find()
+      .select('-password')
+      .exec();
+  }
+
   async findOne(id: string): Promise<Usuario> {
     try {
       console.log('UsuariosService.findOne - Looking for user with ID:', id);
@@ -94,11 +100,11 @@ export class UsuariosService {
   }
 
   async findByEmail(email: string): Promise<Usuario | null> {
-    return this.usuarioModel.findOne({ email, activo: true }).exec();
+    return this.usuarioModel.findOne({ email }).exec();
   }
 
   async findByNombreUsuario(nombreUsuario: string): Promise<Usuario | null> {
-    return this.usuarioModel.findOne({ nombreUsuario, activo: true }).exec();
+    return this.usuarioModel.findOne({ nombreUsuario }).exec();
   }
 
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto): Promise<Usuario> {
@@ -209,5 +215,37 @@ export class UsuariosService {
 
   async validatePassword(user: Usuario, password: string): Promise<boolean> {
     return bcrypt.compare(password, user.password);
+  }
+
+  async disable(id: string): Promise<Usuario> {
+    const usuario = await this.usuarioModel.findByIdAndUpdate(
+      id,
+      { activo: false },
+      { new: true }
+    ).select('-password').exec();
+
+    if (!usuario) {
+      this.logger.error(`Usuario no encontrado para deshabilitar: ${id}`);
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    
+    this.logger.log(`Usuario deshabilitado: ${id}`);
+    return usuario;
+  }
+
+  async enable(id: string): Promise<Usuario> {
+    const usuario = await this.usuarioModel.findByIdAndUpdate(
+      id,
+      { activo: true },
+      { new: true }
+    ).select('-password').exec();
+
+    if (!usuario) {
+      this.logger.error(`Usuario no encontrado para habilitar: ${id}`);
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    
+    this.logger.log(`Usuario habilitado: ${id}`);
+    return usuario;
   }
 }

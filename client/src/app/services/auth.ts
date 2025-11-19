@@ -40,4 +40,34 @@ export class AuthService {
   refrescarToken(token: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/refrescar`, { token });
   }
+
+  isAdmin(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.perfil === 'administrador';
+    } catch {
+      return false;
+    }
+  }
+
+  getUserProfile(): any {
+    const token = this.getToken();
+    if (!token) return null;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return {
+        id: payload.sub || payload.id,
+        email: payload.email,
+        nombreUsuario: payload.nombreUsuario,
+        perfil: payload.perfil,
+        imagenPerfil: payload.imagenPerfil
+      };
+    } catch {
+      return null;
+    }
+  }
 }

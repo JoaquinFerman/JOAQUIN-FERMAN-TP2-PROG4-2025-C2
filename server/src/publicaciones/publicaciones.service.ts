@@ -98,25 +98,26 @@ export class PublicacionesService {
   /**
    * Remove a publication. If userId is provided, verify ownership before deleting.
    */
-  async remove(id: string, user?: { id?: string; nombreUsuario?: string; nombre?: string }) {
+  async remove(id: string, user?: { id?: string; nombreUsuario?: string; nombre?: string; perfil?: string; roles?: string[] }) {
     const post = await this.publicacioneModel.findById(id).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
 
     // Logical deletion: only owner or admin
     if (user && user.id) {
-      if (String((post as any).userId) !== String(user.id)) {
-        // if user has roles and includes admin, allow
-        const u: any = user as any;
-        if (!u.roles || !Array.isArray(u.roles) || !u.roles.includes('admin')) {
-          this.logger.warn(`Usuario ${user.id} intentó borrar publicación ${id} sin ser dueño`);
-          throw new ForbiddenException('No permitido: solo el dueño o un administrador puede eliminar esta publicación');
-        }
+      const isOwner = String((post as any).userId) === String(user.id);
+      const isAdmin = user.perfil === 'administrador' || (user.roles && user.roles.includes('admin'));
+      
+      if (!isOwner && !isAdmin) {
+        this.logger.warn(`Usuario ${user.id} intentó borrar publicación ${id} sin ser dueño ni administrador`);
+        throw new ForbiddenException('No permitido: solo el dueño o un administrador puede eliminar esta publicación');
       }
     } else if (user && (user.nombreUsuario || user.nombre)) {
       const matchesName = (user.nombreUsuario && String(post.userName) === String(user.nombreUsuario)) ||
         (user.nombre && String(post.userName) === String(user.nombre));
-      if (!matchesName) {
-        this.logger.warn(`Usuario ${JSON.stringify(user)} intentó borrar publicación ${id} sin ser dueño (name mismatch)`);
+      const isAdmin = user.perfil === 'administrador' || (user.roles && user.roles.includes('admin'));
+      
+      if (!matchesName && !isAdmin) {
+        this.logger.warn(`Usuario ${JSON.stringify(user)} intentó borrar publicación ${id} sin ser dueño ni administrador (name mismatch)`);
         throw new ForbiddenException('No permitido: solo el dueño o un administrador puede eliminar esta publicación');
       }
     }
@@ -263,5 +264,97 @@ export class PublicacionesService {
     const saved = await post.save();
     this.logger.log(`Comentario ${commentId} editado exitosamente`);
     return saved;
+  }
+
+  // Estadísticas: Publicaciones por usuario en un lapso de tiempo
+  async getPublicacionesPorUsuario(fechaInicio?: string, fechaFin?: string) {
+    const filter: any = { deleted: { $ne: true } };
+    
+    if (fechaInicio || fechaFin) {
+      filter.date = {};
+      if (fechaInicio) filter.date.$gte = new Date(fechaInicio);
+      if (fechaFin) filter.date.$lte = new Date(fechaFin);
+    }
+
+    const result = await this.publicacioneModel.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: '$userId',
+          userName: { $first: '$userName' },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
+    return result.map(item => ({
+      userId: item._id,
+      userName: item.userName,
+      cantidadPublicaciones: item.count
+    }));
+  }
+
+  // Estadísticas: Comentarios totales en un lapso de tiempo
+  async getComentariosTotales(fechaInicio?: string, fechaFin?: string) {
+    const filter: any = { deleted: { $ne: true } };
+    
+    const posts = await this.publicacioneModel.find(filter).exec();
+    
+    let totalComentarios = 0;
+    const comentariosPorFecha: { [key: string]: number } = {};
+
+    for (const post of posts) {
+      for (const comment of post.comments as any[]) {
+        const commentDate = new Date(comment.date);
+        
+        // Filtrar por fecha si se especificó
+        if (fechaInicio && commentDate < new Date(fechaInicio)) continue;
+        if (fechaFin && commentDate > new Date(fechaFin)) continue;
+        
+        totalComentarios++;
+        const dateKey = commentDate.toISOString().split('T')[0];
+        comentariosPorFecha[dateKey] = (comentariosPorFecha[dateKey] || 0) + 1;
+      }
+    }
+
+    return {
+      total: totalComentarios,
+      porFecha: Object.entries(comentariosPorFecha).map(([fecha, cantidad]) => ({
+        fecha,
+        cantidad
+      })).sort((a, b) => a.fecha.localeCompare(b.fecha))
+    };
+  }
+
+  // Estadísticas: Comentarios por publicación en un lapso de tiempo
+  async getComentariosPorPublicacion(fechaInicio?: string, fechaFin?: string) {
+    const filter: any = { deleted: { $ne: true } };
+    
+    const posts = await this.publicacioneModel.find(filter).exec();
+    
+    const result = posts.map(post => {
+      let comentariosFiltrados = post.comments as any[];
+      
+      // Filtrar comentarios por fecha
+      if (fechaInicio || fechaFin) {
+        comentariosFiltrados = comentariosFiltrados.filter((comment: any) => {
+          const commentDate = new Date(comment.date);
+          if (fechaInicio && commentDate < new Date(fechaInicio)) return false;
+          if (fechaFin && commentDate > new Date(fechaFin)) return false;
+          return true;
+        });
+      }
+
+      return {
+        publicacionId: (post as any)._id,
+        userName: post.userName,
+        content: post.content?.substring(0, 50) + '...',
+        cantidadComentarios: comentariosFiltrados.length
+      };
+    }).filter(item => item.cantidadComentarios > 0)
+      .sort((a, b) => b.cantidadComentarios - a.cantidadComentarios);
+
+    return result;
   }
 }
