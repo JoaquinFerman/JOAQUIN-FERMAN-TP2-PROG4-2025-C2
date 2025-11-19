@@ -4,6 +4,11 @@
   "private": true,
   "scripts": {},
   "dependencies": {
+    "@angular/common": "^20.3.13",
+    "@angular/core": "^20.3.13",
+    "@angular/forms": "^20.3.13",
+    "@angular/router": "^20.3.13",
+    "@angular/service-worker": "^20.3.13",
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^11.1.8",
     "class-validator": "^0.14.2",
