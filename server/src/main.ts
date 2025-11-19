@@ -4,7 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 async function bootstrap() {
-  console.log('🚀 Starting server...');
+  console.log('🚀 Starting server... (v1.1 - perfil fix)');
   console.log('📍 MONGODB_URI present:', !!process.env.MONGODB_URI);
   
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
