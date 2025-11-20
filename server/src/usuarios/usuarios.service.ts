@@ -43,6 +43,8 @@ export class UsuariosService {
     }
 
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    this.logger.log(`Validando contraseña: "${createUsuarioDto.password}", longitud: ${createUsuarioDto.password?.length}`);
+    this.logger.log(`Test regex: ${passwordRegex.test(createUsuarioDto.password)}`);
     if (!passwordRegex.test(createUsuarioDto.password)) {
       throw new ConflictException('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número');
     }

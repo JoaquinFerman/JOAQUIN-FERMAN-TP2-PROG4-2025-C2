@@ -76,8 +76,19 @@ export class DashboardUsuariosComponent implements OnInit {
       return;
     }
 
+    // Trim password to remove whitespace
+    const usuarioData = {
+      ...this.nuevoUsuario,
+      password: this.nuevoUsuario.password.trim()
+    };
+
+    console.log('Enviando contraseña:', usuarioData.password);
+    console.log('Longitud:', usuarioData.password.length);
+    console.log('Tiene mayúscula:', /[A-Z]/.test(usuarioData.password));
+    console.log('Tiene número:', /\d/.test(usuarioData.password));
+
     this.cargando = true;
-    this.usuariosService.crearUsuario(this.nuevoUsuario).subscribe({
+    this.usuariosService.crearUsuario(usuarioData).subscribe({
       next: () => {
         alert('Usuario creado exitosamente');
         this.resetFormulario();
@@ -93,14 +104,22 @@ export class DashboardUsuariosComponent implements OnInit {
   }
 
   validarFormulario(): boolean {
-    return !!(
-      this.nuevoUsuario.nombre &&
-      this.nuevoUsuario.apellido &&
-      this.nuevoUsuario.email &&
-      this.nuevoUsuario.nombreUsuario &&
-      this.nuevoUsuario.password &&
-      this.nuevoUsuario.fechaNacimiento
-    );
+    // Validar campos requeridos
+    if (!this.nuevoUsuario.nombre || !this.nuevoUsuario.apellido || 
+        !this.nuevoUsuario.email || !this.nuevoUsuario.nombreUsuario || 
+        !this.nuevoUsuario.password || !this.nuevoUsuario.fechaNacimiento) {
+      return false;
+    }
+
+    // Validar formato de contraseña
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    const trimmedPassword = this.nuevoUsuario.password.trim();
+    if (!passwordRegex.test(trimmedPassword)) {
+      alert('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número (sin espacios al inicio o final)');
+      return false;
+    }
+
+    return true;
   }
 
   habilitarUsuario(id: string) {
