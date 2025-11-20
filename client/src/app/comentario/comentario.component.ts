@@ -27,24 +27,19 @@ export class ComentarioComponent {
   ) {}
 
   isMyComment(): boolean {
-    // Allow admin users to edit any comment
-    try {
-      if (this.authService.isAdmin && this.authService.isAdmin()) return true;
-    } catch (e) {}
-
     const me = this.authService.getUserProfile();
     const myId = me?.id || me?._id || null;
     const myUserName = me?.nombreUsuario || me?.username || null;
-    
+
     // Try ID comparison first
     const owner = this.data?._ownerId || this.data?.userId || this.data?.user?._id || this.data?.user || this.data?.userIdStr || this.data?.ownerId || this.data?.authorId;
     if (myId && owner && String(owner) === String(myId)) return true;
-    
+
     // Fallback: compare userName if ID comparison failed
     if (myUserName && this.data?.userName) {
       return String(this.data.userName) === String(myUserName);
     }
-    
+
     return false;
   }
 

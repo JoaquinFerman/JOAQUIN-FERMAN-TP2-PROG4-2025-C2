@@ -36,7 +36,17 @@ export class DashboardUsuariosComponent implements OnInit {
     perfil: 'usuario' as 'usuario' | 'administrador'
   };
 
+  fotoSeleccionada: File | null = null;
+
   constructor(private usuariosService: UsuariosService) {}
+  onFotoSeleccionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.fotoSeleccionada = input.files[0];
+    } else {
+      this.fotoSeleccionada = null;
+    }
+  }
 
   ngOnInit() {
     this.cargarUsuarios();
