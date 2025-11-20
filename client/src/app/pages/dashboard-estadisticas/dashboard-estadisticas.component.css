@@ -90,6 +90,16 @@ h1 {
   height: 400px;
 }
 
+.empty-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
 .grafico-pie {
   grid-column: span 2;
 }

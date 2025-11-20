@@ -104,11 +104,11 @@
               </td>
               <td>
                 @if (usuario.activo) {
-                  <button class="btn-deshabilitar" (click)="deshabilitarUsuario(getUsuarioId(usuario))">
+                  <button class="btn-deshabilitar" (click)="openConfirm('deshabilitar', usuario)">
                     Deshabilitar
                   </button>
                 } @else {
-                  <button class="btn-habilitar" (click)="habilitarUsuario(getUsuarioId(usuario))">
+                  <button class="btn-habilitar" (click)="openConfirm('habilitar', usuario)">
                     Habilitar
                   </button>
                 }
@@ -117,6 +117,26 @@
           }
         </tbody>
       </table>
+    </div>
+  }
+  
+  <!-- Confirm Modal -->
+  @if (showConfirmModal) {
+    <div class="modal-overlay" (click)="cancelModal()"></div>
+    <div class="modal-box">
+      <h3>{{ confirmAction === 'deshabilitar' ? 'Confirmar deshabilitación' : 'Confirmar habilitación' }}</h3>
+      <p>
+        {{ confirmAction === 'deshabilitar' ? '¿Estás seguro de deshabilitar este usuario? No podrá acceder a la aplicación.' : '¿Estás seguro de habilitar este usuario?' }}
+      </p>
+      @if (confirmTarget) {
+        <p><strong>{{ confirmTarget.nombre }} {{ confirmTarget.apellido }} ({{ confirmTarget.nombreUsuario }})</strong></p>
+      }
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="cancelModal()" [disabled]="confirmLoading">Cancelar</button>
+        <button class="btn-primary" (click)="confirmModal()" [disabled]="confirmLoading">
+          {{ confirmLoading ? (confirmAction === 'deshabilitar' ? 'Deshabilitando...' : 'Habilitando...') : (confirmAction === 'deshabilitar' ? 'Deshabilitar' : 'Habilitar') }}
+        </button>
+      </div>
     </div>
   }
 </div>

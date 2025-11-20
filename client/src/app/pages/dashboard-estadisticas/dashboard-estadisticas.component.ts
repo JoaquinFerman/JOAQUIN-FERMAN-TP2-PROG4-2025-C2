@@ -17,6 +17,13 @@ export class DashboardEstadisticasComponent implements OnInit, AfterViewInit {
   fechaInicio: string = '';
   fechaFin: string = '';
   cargando = false;
+  publicacionesTop10: any[] = [];
+  comentariosTotalesData: any = null;
+  comentariosPorPublicacionTop10: any[] = [];
+
+  loadedPublicaciones = false;
+  loadedComentariosTotales = false;
+  loadedComentariosPorPublicacion = false;
 
   private chartPublicaciones?: Chart;
   private chartComentariosTotales?: Chart;
@@ -50,11 +57,14 @@ export class DashboardEstadisticasComponent implements OnInit, AfterViewInit {
   cargarPublicacionesPorUsuario() {
     this.estadisticasService.getPublicacionesPorUsuario(this.fechaInicio, this.fechaFin).subscribe({
       next: (data) => {
-        this.crearGraficoPublicaciones(data);
+        this.publicacionesTop10 = (data || []).slice(0,10);
+        this.loadedPublicaciones = true;
+        this.crearGraficoPublicaciones(this.publicacionesTop10);
         this.cargando = false;
       },
       error: (error) => {
         console.error('Error cargando publicaciones por usuario:', error);
+        this.loadedPublicaciones = true;
         this.cargando = false;
       }
     });
@@ -63,10 +73,13 @@ export class DashboardEstadisticasComponent implements OnInit, AfterViewInit {
   cargarComentariosTotales() {
     this.estadisticasService.getComentariosTotales(this.fechaInicio, this.fechaFin).subscribe({
       next: (data) => {
+        this.comentariosTotalesData = data;
+        this.loadedComentariosTotales = true;
         this.crearGraficoComentariosTotales(data);
       },
       error: (error) => {
         console.error('Error cargando comentarios totales:', error);
+        this.loadedComentariosTotales = true;
       }
     });
   }
@@ -74,34 +87,76 @@ export class DashboardEstadisticasComponent implements OnInit, AfterViewInit {
   cargarComentariosPorPublicacion() {
     this.estadisticasService.getComentariosPorPublicacion(this.fechaInicio, this.fechaFin).subscribe({
       next: (data) => {
-        this.crearGraficoComentariosPorPublicacion(data);
+        this.comentariosPorPublicacionTop10 = (data || []).slice(0,10);
+        this.loadedComentariosPorPublicacion = true;
+        this.crearGraficoComentariosPorPublicacion(this.comentariosPorPublicacionTop10);
       },
       error: (error) => {
         console.error('Error cargando comentarios por publicación:', error);
+        this.loadedComentariosPorPublicacion = true;
       }
     });
   }
 
-  crearGraficoPublicaciones(data: any[]) {
+  get showNoDataBlock(): boolean {
+    // true when all three have finished loading and all are empty/zero
+    if (!this.loadedPublicaciones || !this.loadedComentariosTotales || !this.loadedComentariosPorPublicacion) return false;
+    const publicacionesEmpty = !this.publicacionesTop10 || this.publicacionesTop10.length === 0;
+    const comentariosTotalesEmpty = !this.comentariosTotalesData || this.comentariosTotalesData.total === 0;
+    const comentariosPorPublicacionEmpty = !this.comentariosPorPublicacionTop10 || this.comentariosPorPublicacionTop10.length === 0;
+    return publicacionesEmpty && comentariosTotalesEmpty && comentariosPorPublicacionEmpty;
+  }
+
+  private async waitForCanvas(id: string, retries = 10, delayMs = 50): Promise<HTMLCanvasElement | null> {
+    for (let i = 0; i < retries; i++) {
+      const el = document.getElementById(id) as HTMLCanvasElement | null;
+      if (el && el.clientWidth > 0 && el.clientHeight > 0) return el;
+      // element may exist but not yet measured; wait a bit
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+    return document.getElementById(id) as HTMLCanvasElement | null;
+  }
+
+  async crearGraficoPublicaciones(data: any[]) {
     if (this.chartPublicaciones) {
       this.chartPublicaciones.destroy();
     }
 
-    const canvas = document.getElementById('chartPublicaciones') as HTMLCanvasElement;
-    if (!canvas) return;
+    console.log('crearGraficoPublicaciones - datos recibidos:', data);
+    const top10 = (data || []).slice(0, 10);
+
+    // Guardar para la plantilla: si está vacío mostramos un mensaje en lugar del canvas
+    this.publicacionesTop10 = top10;
+
+    if (!top10 || top10.length === 0) {
+      console.warn('crearGraficoPublicaciones - No hay datos para mostrar en Publicaciones por Usuario');
+      return;
+    }
+
+    // Ahora que la plantilla conoce que hay datos, esperamos a que el canvas exista en el DOM
+    const canvas = await this.waitForCanvas('chartPublicaciones');
+    if (!canvas) {
+      console.warn('crearGraficoPublicaciones - canvas no encontrado tras reintentos');
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('crearGraficoPublicaciones - no se obtuvo contexto 2d del canvas');
+      return;
+    }
 
-    const top10 = data.slice(0, 10);
+    console.log('crearGraficoPublicaciones - canvas size', canvas.clientWidth, canvas.clientHeight);
+    const labels = top10.map(item => item.userName || item.user || item.nombreUsuario || 'Usuario');
+    const values = top10.map(item => item.cantidadPublicaciones ?? item.count ?? 0);
 
     this.chartPublicaciones = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: top10.map(item => item.userName),
+        labels,
         datasets: [{
           label: 'Cantidad de Publicaciones',
-          data: top10.map(item => item.cantidadPublicaciones),
+          data: values,
           backgroundColor: 'rgba(102, 126, 234, 0.8)',
           borderColor: 'rgba(102, 126, 234, 1)',
           borderWidth: 1
@@ -132,16 +187,25 @@ export class DashboardEstadisticasComponent implements OnInit, AfterViewInit {
     });
   }
 
-  crearGraficoComentariosTotales(data: any) {
+  async crearGraficoComentariosTotales(data: any) {
     if (this.chartComentariosTotales) {
       this.chartComentariosTotales.destroy();
     }
 
-    const canvas = document.getElementById('chartComentariosTotales') as HTMLCanvasElement;
-    if (!canvas) return;
+    const canvas = await this.waitForCanvas('chartComentariosTotales');
+    if (!canvas) {
+      console.warn('crearGraficoComentariosTotales - canvas no encontrado tras reintentos');
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('crearGraficoComentariosTotales - no se obtuvo contexto 2d');
+      return;
+    }
+
+    console.log('crearGraficoComentariosTotales - datos recibidos:', data);
+    console.log('crearGraficoComentariosTotales - canvas size', canvas.clientWidth, canvas.clientHeight);
 
     this.chartComentariosTotales = new Chart(ctx, {
       type: 'line',
@@ -181,26 +245,38 @@ export class DashboardEstadisticasComponent implements OnInit, AfterViewInit {
     });
   }
 
-  crearGraficoComentariosPorPublicacion(data: any[]) {
+  async crearGraficoComentariosPorPublicacion(data: any[]) {
     if (this.chartComentariosPorPublicacion) {
       this.chartComentariosPorPublicacion.destroy();
     }
 
-    const canvas = document.getElementById('chartComentariosPorPublicacion') as HTMLCanvasElement;
-    if (!canvas) return;
+    const canvas = await this.waitForCanvas('chartComentariosPorPublicacion');
+    if (!canvas) {
+      console.warn('crearGraficoComentariosPorPublicacion - canvas no encontrado tras reintentos');
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('crearGraficoComentariosPorPublicacion - no se obtuvo contexto 2d');
+      return;
+    }
 
-    const top10 = data.slice(0, 10);
+    const top10 = (data || []).slice(0, 10);
+    if (!top10 || top10.length === 0) {
+      console.warn('crearGraficoComentariosPorPublicacion - no hay datos');
+      return;
+    }
+
+    console.log('crearGraficoComentariosPorPublicacion - canvas size', canvas.clientWidth, canvas.clientHeight);
 
     this.chartComentariosPorPublicacion = new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: top10.map(item => `${item.userName}: ${item.content}`),
+        labels: top10.map(item => `${item.userName || item.user || 'Usuario'}: ${item.content || item.title || ''}`),
         datasets: [{
           label: 'Comentarios',
-          data: top10.map(item => item.cantidadComentarios),
+          data: top10.map(item => item.cantidadComentarios ?? item.count ?? 0),
           backgroundColor: [
             'rgba(255, 99, 132, 0.8)',
             'rgba(54, 162, 235, 0.8)',

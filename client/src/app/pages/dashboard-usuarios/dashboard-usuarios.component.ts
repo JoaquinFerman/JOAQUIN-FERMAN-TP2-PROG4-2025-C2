@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsuariosService, Usuario } from '../../services/usuarios.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-usuarios',
@@ -14,6 +15,11 @@ export class DashboardUsuariosComponent implements OnInit {
   usuarios: Usuario[] = [];
   mostrarFormulario = false;
   cargando = false;
+  // Confirm modal state
+  showConfirmModal = false;
+  confirmAction: 'deshabilitar' | 'habilitar' | '' = '';
+  confirmTarget: Usuario | null = null;
+  confirmLoading = false;
 
   nuevoUsuario = {
     nombre: '',
@@ -98,31 +104,49 @@ export class DashboardUsuariosComponent implements OnInit {
   }
 
   habilitarUsuario(id: string) {
-    if (confirm('¿Estás seguro de habilitar este usuario?')) {
-      this.usuariosService.habilitarUsuario(id).subscribe({
-        next: () => {
-          this.cargarUsuarios();
-        },
-        error: (error) => {
-          console.error('Error habilitando usuario:', error);
-          alert('Error al habilitar el usuario');
-        }
-      });
-    }
+    // Open confirmation modal for enabling
+    const usuario = this.usuarios.find(u => this.getUsuarioId(u) === id) || null;
+    this.openConfirm('habilitar', usuario);
   }
 
   deshabilitarUsuario(id: string) {
-    if (confirm('¿Estás seguro de deshabilitar este usuario? No podrá acceder a la aplicación.')) {
-      this.usuariosService.deshabilitarUsuario(id).subscribe({
-        next: () => {
-          this.cargarUsuarios();
-        },
-        error: (error) => {
-          console.error('Error deshabilitando usuario:', error);
-          alert('Error al deshabilitar el usuario');
-        }
-      });
+    // Open confirmation modal for disabling
+    const usuario = this.usuarios.find(u => this.getUsuarioId(u) === id) || null;
+    this.openConfirm('deshabilitar', usuario);
+  }
+
+  openConfirm(action: 'deshabilitar' | 'habilitar', usuario: Usuario | null) {
+    this.confirmAction = action;
+    this.confirmTarget = usuario;
+    this.showConfirmModal = true;
+  }
+
+  async confirmModal() {
+    if (!this.confirmAction || !this.confirmTarget) return;
+    this.confirmLoading = true;
+    const id = this.getUsuarioId(this.confirmTarget);
+    try {
+      if (this.confirmAction === 'deshabilitar') {
+        await firstValueFrom(this.usuariosService.deshabilitarUsuario(id));
+      } else {
+        await firstValueFrom(this.usuariosService.habilitarUsuario(id));
+      }
+      this.cargarUsuarios();
+    } catch (error) {
+      console.error(`Error en ${this.confirmAction} usuario:`, error);
+      alert('Error al ejecutar la acción en el usuario');
+    } finally {
+      this.confirmLoading = false;
+      this.showConfirmModal = false;
+      this.confirmAction = '';
+      this.confirmTarget = null;
     }
+  }
+
+  cancelModal() {
+    this.showConfirmModal = false;
+    this.confirmAction = '';
+    this.confirmTarget = null;
   }
 
   getUsuarioId(usuario: Usuario): string {

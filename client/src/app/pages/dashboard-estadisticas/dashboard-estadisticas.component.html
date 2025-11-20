@@ -21,18 +21,26 @@
   }
 
   @if (!cargando) {
-    <div class="graficos-grid">
-      <div class="grafico-card">
-        <canvas id="chartPublicaciones"></canvas>
+    @if (showNoDataBlock) {
+      <div class="graficos-grid">
+        <div class="grafico-card" style="grid-column: 1 / -1;">
+          <div class="empty-message">No hay datos para el rango seleccionado.</div>
+        </div>
       </div>
+    } @else {
+      <div class="graficos-grid">
+        <div class="grafico-card">
+          <canvas id="chartPublicaciones"></canvas>
+        </div>
 
-      <div class="grafico-card">
-        <canvas id="chartComentariosTotales"></canvas>
-      </div>
+        <div class="grafico-card">
+          <canvas id="chartComentariosTotales"></canvas>
+        </div>
 
-      <div class="grafico-card grafico-pie">
-        <canvas id="chartComentariosPorPublicacion"></canvas>
+        <div class="grafico-card grafico-pie">
+          <canvas id="chartComentariosPorPublicacion"></canvas>
+        </div>
       </div>
-    </div>
+    }
   }
 </div>
