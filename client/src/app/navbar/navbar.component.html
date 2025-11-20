@@ -11,6 +11,7 @@
     <div class="navbar-menu" [class.active]="menuAbierto">
       @if (authService.isLoggedIn()) {
         <a routerLink="/publicaciones" class="nav-link">Publicaciones</a>
+        <a routerLink="/pwa-demo" class="nav-link">🚀 PWA Demo</a>
         
         @if (authService.isAdmin()) {
           <div class="dropdown" [class.active]="dashboardAbierto">

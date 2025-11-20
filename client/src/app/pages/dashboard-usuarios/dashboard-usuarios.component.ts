@@ -21,6 +21,14 @@ export class DashboardUsuariosComponent implements OnInit {
   confirmTarget: Usuario | null = null;
   confirmLoading = false;
 
+  // Notification modal state
+  showNotificationModal = false;
+  notificationMessage = '';
+  notificationType: 'success' | 'error' | 'warning' = 'success';
+
+  // Exponer Object para el template
+  Object = Object;
+
   nuevoUsuario = {
     nombre: '',
     apellido: '',
@@ -72,7 +80,7 @@ export class DashboardUsuariosComponent implements OnInit {
 
   crearUsuario() {
     if (!this.validarFormulario()) {
-      alert('Por favor completa todos los campos obligatorios');
+      this.showNotification('Por favor completa todos los campos obligatorios', 'warning');
       return;
     }
 
@@ -90,14 +98,14 @@ export class DashboardUsuariosComponent implements OnInit {
     this.cargando = true;
     this.usuariosService.crearUsuario(usuarioData).subscribe({
       next: () => {
-        alert('Usuario creado exitosamente');
+        this.showNotification('Usuario creado exitosamente', 'success');
         this.resetFormulario();
         this.mostrarFormulario = false;
         this.cargarUsuarios();
       },
       error: (error) => {
         console.error('Error creando usuario:', error);
-        alert(error.error?.message || 'Error al crear el usuario');
+        this.showNotification(error.error?.message || 'Error al crear el usuario', 'error');
         this.cargando = false;
       }
     });
@@ -115,7 +123,7 @@ export class DashboardUsuariosComponent implements OnInit {
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     const trimmedPassword = this.nuevoUsuario.password.trim();
     if (!passwordRegex.test(trimmedPassword)) {
-      alert('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número (sin espacios al inicio o final)');
+      this.showNotification('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número (sin espacios al inicio o final)', 'warning');
       return false;
     }
 
@@ -153,7 +161,7 @@ export class DashboardUsuariosComponent implements OnInit {
       this.cargarUsuarios();
     } catch (error) {
       console.error(`Error en ${this.confirmAction} usuario:`, error);
-      alert('Error al ejecutar la acción en el usuario');
+      this.showNotification('Error al ejecutar la acción en el usuario', 'error');
     } finally {
       this.confirmLoading = false;
       this.showConfirmModal = false;
@@ -170,5 +178,16 @@ export class DashboardUsuariosComponent implements OnInit {
 
   getUsuarioId(usuario: Usuario): string {
     return usuario._id || usuario.id || '';
+  }
+
+  showNotification(message: string, type: 'success' | 'error' | 'warning') {
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotificationModal = true;
+  }
+
+  closeNotification() {
+    this.showNotificationModal = false;
+    this.notificationMessage = '';
   }
 }

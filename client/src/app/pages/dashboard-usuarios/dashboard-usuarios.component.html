@@ -139,4 +139,66 @@
       </div>
     </div>
   }
+
+  <!-- Notification Modal -->
+  @if (showNotificationModal) {
+    <div class="modal-overlay" (click)="closeNotification()"></div>
+    <div class="modal-box notification-modal" [class.success]="notificationType === 'success'" [class.error]="notificationType === 'error'" [class.warning]="notificationType === 'warning'">
+      <div class="notification-icon">
+        @if (notificationType === 'success') {
+          <span class="icon-success">✓</span>
+        }
+        @if (notificationType === 'error') {
+          <span class="icon-error">✗</span>
+        }
+        @if (notificationType === 'warning') {
+          <span class="icon-warning">⚠</span>
+        }
+      </div>
+      <p class="notification-text">{{ notificationMessage }}</p>
+      <div class="modal-actions">
+        <button class="btn-primary" (click)="closeNotification()">Aceptar</button>
+      </div>
+    </div>
+  }
+
+  <!-- Panel de Directivas (Solo para demostración) -->
+  <div class="directivas-panel">
+    <h3>🔍 Directivas Activas en Tiempo Real</h3>
+    
+    <div class="directiva-item">
+      <strong>&#64;if (showNotificationModal):</strong>
+      <span [class.activo]="showNotificationModal">{{ showNotificationModal ? '✓ Activo' : '✗ Inactivo' }}</span>
+    </div>
+
+    <div class="directiva-item">
+      <strong>&#64;if (showConfirmModal):</strong>
+      <span [class.activo]="showConfirmModal">{{ showConfirmModal ? '✓ Activo' : '✗ Inactivo' }}</span>
+    </div>
+
+    <div class="directiva-item">
+      <strong>&#64;if (mostrarFormulario):</strong>
+      <span [class.activo]="mostrarFormulario">{{ mostrarFormulario ? '✓ Activo' : '✗ Inactivo' }}</span>
+    </div>
+
+    <div class="directiva-item">
+      <strong>&#64;for (usuario of usuarios):</strong>
+      <span>{{ usuarios.length }} iteraciones</span>
+    </div>
+
+    <div class="directiva-item">
+      <strong>[disabled]="cargando":</strong>
+      <span [class.activo]="cargando">{{ cargando ? '✓ Deshabilitado' : '✗ Habilitado' }}</span>
+    </div>
+
+    <div class="directiva-item">
+      <strong>[class.success]="notificationType === 'success'":</strong>
+      <span [class.activo]="notificationType === 'success'">{{ notificationType === 'success' ? '✓ Aplicado' : '✗ No aplicado' }}</span>
+    </div>
+
+    <div class="directiva-item">
+      <strong>[(ngModel)] bindings:</strong>
+      <span>{{ Object.keys(nuevoUsuario).length }} campos enlazados</span>
+    </div>
+  </div>
 </div>

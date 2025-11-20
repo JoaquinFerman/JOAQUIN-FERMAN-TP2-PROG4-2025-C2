@@ -1,0 +1,161 @@
+<div class="pwa-demo-container">
+  <div class="header">
+    <h1>🚀 Demostración PWA</h1>
+    <p>Progressive Web App - Características y Funcionalidades</p>
+  </div>
+
+  <!-- Estado General -->
+  <div class="card">
+    <h2>📊 Estado General</h2>
+    <div class="status-grid">
+      <div class="status-item" [class.active]="isOnline">
+        <span class="icon">{{ isOnline ? '🟢' : '🔴' }}</span>
+        <div>
+          <strong>Conexión</strong>
+          <p>{{ isOnline ? 'Online' : 'Offline' }}</p>
+        </div>
+      </div>
+
+      <div class="status-item" [class.active]="isPWA">
+        <span class="icon">{{ isPWA ? '✅' : '❌' }}</span>
+        <div>
+          <strong>Modo PWA</strong>
+          <p>{{ isPWA ? 'Instalada' : 'No instalada' }}</p>
+        </div>
+      </div>
+
+      <div class="status-item" [class.active]="serviceWorkerStatus.includes('Active')">
+        <span class="icon">🔧</span>
+        <div>
+          <strong>Service Worker</strong>
+          <p>{{ serviceWorkerStatus }}</p>
+        </div>
+      </div>
+
+      <div class="status-item">
+        <span class="icon">💾</span>
+        <div>
+          <strong>Cache</strong>
+          <p>{{ cacheStatus }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instalación -->
+  @if (isInstallable && !isPWA) {
+    <div class="card install-card">
+      <h2>📲 Instalar Aplicación</h2>
+      <p>Esta aplicación puede instalarse en tu dispositivo como una app nativa.</p>
+      <button class="btn-install" (click)="installPWA()">
+        Instalar PWA
+      </button>
+    </div>
+  }
+
+  <!-- Actualización -->
+  @if (hasUpdate) {
+    <div class="card update-card">
+      <h2>🔄 Actualización Disponible</h2>
+      <p>Hay una nueva versión de la aplicación disponible.</p>
+      <button class="btn-update" (click)="reloadApp()">
+        Actualizar Ahora
+      </button>
+    </div>
+  }
+
+  <!-- Funcionalidades PWA -->
+  <div class="card">
+    <h2>✨ Funcionalidades PWA</h2>
+    
+    <div class="feature">
+      <h3>1️⃣ Funciona Offline</h3>
+      <p>La app cachea recursos y puede funcionar sin conexión.</p>
+      <button class="btn-secondary" (click)="testOffline()">
+        Cómo Probar
+      </button>
+    </div>
+
+    <div class="feature">
+      <h3>2️⃣ Instalable</h3>
+      <p>Se puede instalar en el escritorio o pantalla de inicio.</p>
+      <ul>
+        <li>En Chrome: Click en ⋮ → "Instalar aplicación"</li>
+        <li>En móvil: "Agregar a pantalla de inicio"</li>
+      </ul>
+    </div>
+
+    <div class="feature">
+      <h3>3️⃣ Service Worker</h3>
+      <p>Intercepta peticiones y maneja el cache automáticamente.</p>
+      <p><strong>Estado:</strong> {{ serviceWorkerStatus }}</p>
+    </div>
+
+    <div class="feature">
+      <h3>4️⃣ Cache Inteligente</h3>
+      <p>Almacena recursos para carga rápida y funcionamiento offline.</p>
+      <p><strong>Estado:</strong> {{ cacheStatus }}</p>
+      <button class="btn-secondary" (click)="clearCache()">
+        Limpiar Cache
+      </button>
+    </div>
+
+    <div class="feature">
+      <h3>5️⃣ Actualizaciones Automáticas</h3>
+      <p>Detecta y aplica nuevas versiones automáticamente.</p>
+      <p><strong>Estado:</strong> {{ hasUpdate ? 'Actualización disponible' : 'Actualizado' }}</p>
+    </div>
+  </div>
+
+  <!-- Instrucciones de Prueba -->
+  <div class="card instructions">
+    <h2>🧪 Cómo Probar el PWA</h2>
+    
+    <div class="instruction-step">
+      <strong>1. Servir en Producción</strong>
+      <code>npm run build && npx http-server dist/client -p 8080 --ssl</code>
+      <p>O despliega en Vercel/Netlify (automático con HTTPS)</p>
+    </div>
+
+    <div class="instruction-step">
+      <strong>2. Verificar HTTPS</strong>
+      <p>Los PWA requieren HTTPS (excepto en localhost)</p>
+    </div>
+
+    <div class="instruction-step">
+      <strong>3. Abrir DevTools</strong>
+      <p>F12 → Application → Service Workers / Manifest</p>
+    </div>
+
+    <div class="instruction-step">
+      <strong>4. Probar Offline</strong>
+      <p>DevTools → Network → Activar "Offline"</p>
+    </div>
+
+    <div class="instruction-step">
+      <strong>5. Instalar</strong>
+      <p>Chrome mostrará el ícono de instalación en la barra de direcciones</p>
+    </div>
+  </div>
+
+  <!-- Herramientas de Auditoría -->
+  <div class="card tools">
+    <h2>🔍 Herramientas de Auditoría</h2>
+    
+    <div class="tool-item">
+      <strong>Lighthouse</strong>
+      <p>DevTools → Lighthouse → Genera reporte PWA</p>
+      <p>Evalúa: Performance, PWA, Accessibility, Best Practices, SEO</p>
+    </div>
+
+    <div class="tool-item">
+      <strong>Chrome DevTools</strong>
+      <p>F12 → Application → verifica Manifest, Service Workers, Cache Storage</p>
+    </div>
+
+    <div class="tool-item">
+      <strong>PWA Builder</strong>
+      <p><a href="https://www.pwabuilder.com/" target="_blank">pwabuilder.com</a> - Analiza tu PWA</p>
+    </div>
+  </div>
+</div>
