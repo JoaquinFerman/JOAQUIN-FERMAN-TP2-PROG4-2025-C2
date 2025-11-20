@@ -26,9 +26,6 @@ export class DashboardUsuariosComponent implements OnInit {
   notificationMessage = '';
   notificationType: 'success' | 'error' | 'warning' = 'success';
 
-  // Exponer Object para el template
-  Object = Object;
-
   nuevoUsuario = {
     nombre: '',
     apellido: '',
@@ -89,11 +86,6 @@ export class DashboardUsuariosComponent implements OnInit {
       ...this.nuevoUsuario,
       password: this.nuevoUsuario.password.trim()
     };
-
-    console.log('Enviando contraseña:', usuarioData.password);
-    console.log('Longitud:', usuarioData.password.length);
-    console.log('Tiene mayúscula:', /[A-Z]/.test(usuarioData.password));
-    console.log('Tiene número:', /\d/.test(usuarioData.password));
 
     this.cargando = true;
     this.usuariosService.crearUsuario(usuarioData).subscribe({

@@ -47,8 +47,6 @@ export class RegistroComponent {
     const hasNumber = /[0-9]/.test(value);
     const hasMinLength = value.length >= 8;
     
-    console.log('Password validation:', { value, hasUpperCase, hasNumber, hasMinLength });
-    
     const valid = hasUpperCase && hasNumber && hasMinLength;
     return valid ? null : { invalidPassword: true };
   }

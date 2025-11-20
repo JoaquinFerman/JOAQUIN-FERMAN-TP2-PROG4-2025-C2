@@ -7,7 +7,6 @@ import { LoadingComponent } from './loading/loading.component';
 import { PublicacionDetalleComponent } from './pages/publicacion-detalle/publicacion-detalle.component';
 import { DashboardUsuariosComponent } from './pages/dashboard-usuarios/dashboard-usuarios.component';
 import { DashboardEstadisticasComponent } from './pages/dashboard-estadisticas/dashboard-estadisticas.component';
-import { PwaDemoComponent } from './pages/pwa-demo/pwa-demo.component';
 import { authGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -34,11 +33,6 @@ export const routes: Routes = [
     path: 'dashboard/estadisticas',
     component: DashboardEstadisticasComponent,
     canActivate: [authGuard, AdminGuard]
-  },
-  {
-    path: 'pwa-demo',
-    component: PwaDemoComponent,
-    canActivate: [authGuard]
   },
   { path: '**', redirectTo: '/login' }
 ];
