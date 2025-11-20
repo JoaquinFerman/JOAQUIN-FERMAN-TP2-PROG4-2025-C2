@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 
 export type PublicacioneDocument = Publicacione & Document;
 
-@Schema({ _id: false })
+@Schema()
 export class Comment {
 	@Prop({ required: true })
 	userName: string;

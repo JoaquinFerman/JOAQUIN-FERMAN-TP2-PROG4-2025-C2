@@ -75,10 +75,8 @@ export class ComentarioComponent {
     const pId = this.postId || this.data?.postId || this.data?.publicationId || this.data?.post?._id || this.data?.post?.id;
     const cId = this.data?._id || this.data?.id || this.data?.commentId;
     
-    console.log('Debug saveEdit:', { postId: this.postId, data: this.data, pId, cId });
-    
     if (!pId || !cId) {
-      console.error('postId o commentId faltan para editar', { pId, cId, postId: this.postId, data: this.data });
+      console.error('postId o commentId faltan para editar');
       this.notificationService.error('No se puede editar este comentario (faltan IDs)');
       return;
     }

@@ -22,10 +22,8 @@ export class PublicacionComponent {
       console.error('No se pudo obtener el userId para dar like');
       return;
     }
-    console.log('Enviando like para post:', this.data._id, 'userId:', userId);
     this.postsService.like(this.data._id, userId).subscribe({
       next: (post) => {
-        console.log('Like agregado exitosamente:', post);
         this.data.liked = true;
         this.data.likesCount = post.likesCount;
       },
@@ -41,10 +39,8 @@ export class PublicacionComponent {
       console.error('No se pudo obtener el userId para quitar like');
       return;
     }
-    console.log('Enviando unlike para post:', this.data._id, 'userId:', userId);
     this.postsService.unlike(this.data._id, userId).subscribe({
       next: (post) => {
-        console.log('Unlike exitoso:', post);
         this.data.liked = false;
         this.data.likesCount = post.likesCount;
       },
@@ -71,10 +67,7 @@ export class PublicacionComponent {
     }
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      console.log('JWT Payload:', payload);
-      // El backend usa 'sub' como userId
       const userId = payload.sub || payload.userId || payload.id || null;
-      console.log('UserId extraído:', userId);
       return userId;
     } catch (error) {
       console.error('Error al decodificar token:', error);
@@ -101,11 +94,8 @@ export class PublicacionComponent {
       content,
       date: new Date()
     };
-    console.log('Enviando comentario:', comment);
     this.postsService.addComment(this.data._id, comment).subscribe({
       next: (post) => {
-        console.log('Comentario agregado exitosamente:', post);
-        console.log('Estructura del primer comentario:', post.comments?.[0]);
         // Normalizar _ownerId y asegurar _id en cada comentario recibido
         this.data.comments = (post.comments || []).map((c: any, idx: number) => ({
           ...c,
@@ -127,9 +117,7 @@ export class PublicacionComponent {
     }
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      // El backend usa 'nombreUsuario'
       const userName = payload.nombreUsuario || payload.userName || payload.username || payload.name || null;
-      console.log('UserName extraído:', userName);
       return userName;
     } catch (error) {
       console.error('Error al decodificar token:', error);
