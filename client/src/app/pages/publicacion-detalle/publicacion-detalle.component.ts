@@ -59,9 +59,25 @@ export class PublicacionDetalleComponent implements OnInit {
     this.postsService.getCommentsPaginated(postId, page, 10).subscribe({
       next: (response) => {
         if (page === 1) {
-          this.comentarios = response.comments;
+          // Asegurar que cada comentario tenga un identificador único y un ownerId normalizado
+          this.comentarios = (response.comments || []).map((c: any, idx: number) => {
+            const ownerId = c.userId || c.user?._id || c.user || c.userIdStr || c.ownerId || c.authorId || null;
+            return {
+              ...c,
+              _localId: c._id || c.id || (`local-${Date.now()}-${idx}`),
+              _ownerId: ownerId
+            };
+          });
         } else {
-          this.comentarios = [...this.comentarios, ...response.comments];
+          const more = (response.comments || []).map((c: any, idx: number) => {
+            const ownerId = c.userId || c.user?._id || c.user || c.userIdStr || c.ownerId || c.authorId || null;
+            return {
+              ...c,
+              _localId: c._id || c.id || (`local-${Date.now()}-${this.comentarios.length + idx}`),
+              _ownerId: ownerId
+            };
+          });
+          this.comentarios = [...this.comentarios, ...more];
         }
         this.currentPage = response.page;
         this.hasMore = response.hasMore;
@@ -121,8 +137,22 @@ export class PublicacionDetalleComponent implements OnInit {
     if (!token) return false;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      const userId = payload.sub || payload.id;
-      return String(comment.userId) === String(userId);
+      const userId = payload.sub || payload.id || payload.userId || null;
+      const userName = payload.nombreUsuario || payload.username || null;
+      
+      // Admins can always edit
+      try { if ((payload.perfil || payload.role || '').toLowerCase() === 'administrador') return true; } catch(e) {}
+      
+      // Try ID comparison first
+      const owner = comment?._ownerId || comment?.userId || comment?.user?._id || comment?.user || comment?.userIdStr || comment?.ownerId || comment?.authorId;
+      if (userId && owner && String(owner) === String(userId)) return true;
+      
+      // Fallback: compare userName
+      if (userName && comment?.userName) {
+        return String(comment.userName) === String(userName);
+      }
+      
+      return false;
     } catch {
       return false;
     }

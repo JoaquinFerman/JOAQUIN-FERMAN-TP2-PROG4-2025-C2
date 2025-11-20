@@ -165,8 +165,31 @@
             @for (comentario of publicacionExpandida.comments; track comentario) {
               <div class="comentario-expandido">
                 <strong>{{ comentario.userName }}</strong>
-                <p>{{ comentario.content }}</p>
-                <small>{{ comentario.date | date:'short' }}</small>
+
+                @if (editingCommentId === (comentario._id || comentario.id)) {
+                  <div class="editar-comentario">
+                    <textarea rows="3" [(ngModel)]="editingContent"></textarea>
+                    <div class="acciones-edicion-comentario">
+                      <button class="btn-guardar" (click)="saveEditComment(comentario)">Guardar</button>
+                      <button class="btn-cancelar" (click)="cancelEditComment()">Cancelar</button>
+                    </div>
+                  </div>
+                } @else {
+                  <p>
+                    {{ comentario.content }}
+                    @if (isCommentEdited(comentario)) {
+                      <span class="editado-indicador"> [editado]</span>
+                    }
+                  </p>
+                  <small>{{ comentario.date | date:'short' }}</small>
+
+                  <!-- Mostrar botón editar solo si es del usuario actual -->
+                  @if (isCommentOwner(comentario)) {
+                    <div class="acciones-comentario">
+                      <button class="btn-editar" (click)="startEditComment(comentario)">Editar</button>
+                    </div>
+                  }
+                }
               </div>
             }
           </div>

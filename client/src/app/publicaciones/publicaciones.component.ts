@@ -78,7 +78,14 @@ export class PublicacionesComponent implements OnInit {
       next: (res) => {
         // Server returns either { total, posts } when paginated or an array (legacy)
         if (res && res.posts) {
-          this.publicaciones = res.posts;
+          this.publicaciones = (res.posts || []).map((p: any) => ({
+            ...p,
+            comments: (p.comments || []).map((c: any, idx: number) => ({
+              ...c,
+              _id: c._id || c.id || `temp-${Date.now()}-${idx}`,
+              _ownerId: c.userId || c.user?._id || c.user || c.userIdStr || c.ownerId || c.authorId || null
+            }))
+          }));
           this.totalPaginas = Math.ceil(res.total / this.publicacionesPorPagina) || 1;
         } else if (Array.isArray(res)) {
           let orderedPosts = [...res];
@@ -90,10 +97,23 @@ export class PublicacionesComponent implements OnInit {
           this.totalPaginas = Math.ceil(orderedPosts.length / this.publicacionesPorPagina);
           const start = (this.paginaActual - 1) * this.publicacionesPorPagina;
           const end = start + this.publicacionesPorPagina;
-          this.publicaciones = orderedPosts.slice(start, end);
+          this.publicaciones = orderedPosts.slice(start, end).map((p: any) => ({
+            ...p,
+            comments: (p.comments || []).map((c: any, idx: number) => ({
+              ...c,
+              _id: c._id || c.id || `temp-${Date.now()}-${idx}`,
+              _ownerId: c.userId || c.user?._id || c.user || c.userIdStr || c.ownerId || c.authorId || null
+            }))
+          }));
         } else {
           // fallback
-          this.publicaciones = res || [];
+          this.publicaciones = (res || []).map((p: any) => ({
+            ...p,
+            comments: (p.comments || []).map((c: any) => ({
+              ...c,
+              _ownerId: c.userId || c.user?._id || c.user || c.userIdStr || c.ownerId || c.authorId || null
+            }))
+          }));
           this.totalPaginas = 1;
         }
         this.cargando = false;

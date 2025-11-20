@@ -4,5 +4,22 @@
   }
   <span class="usuario-nombre">{{data.userName}}</span>
   <span class="fecha">{{data.date | date:'short'}}</span>
-  <p class="contenido">{{data.content}}</p>
+
+  @if (editing) {
+    <div class="editar-comentario">
+      <textarea rows="3" [(ngModel)]="editContent"></textarea>
+      <div class="acciones-edicion-comentario">
+        <button class="btn-guardar" (click)="saveEdit()">Guardar</button>
+        <button class="btn-cancelar" (click)="cancelEdit()">Cancelar</button>
+      </div>
+    </div>
+  } @else {
+    <p class="contenido">{{data.content}} @if (isCommentEdited()) {<span class="editado-indicador"> [editado]</span>} </p>
+    <!-- Mostrar editar si es propio -->
+    @if (isMyComment()) {
+      <div class="acciones-comentario">
+        <button class="btn-editar" (click)="startEdit()">Editar</button>
+      </div>
+    }
+  }
 </div>

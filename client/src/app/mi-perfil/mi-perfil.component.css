@@ -519,6 +519,28 @@
   color: #555;
 }
 
+.editar-comentario textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #dfe6ff;
+  resize: vertical;
+  font-size: 0.95rem;
+}
+
+.acciones-edicion-comentario {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  justify-content: flex-end;
+}
+
+.editado-indicador {
+  color: #999;
+  font-size: 0.85rem;
+  margin-left: 6px;
+}
+
 .sin-comentarios {
   color: #999;
   font-style: italic;

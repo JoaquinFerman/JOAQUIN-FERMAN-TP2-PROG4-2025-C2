@@ -36,7 +36,7 @@
       <h3>Comentarios</h3>
 
       <div class="comentarios-lista">
-        @for (comentario of comentarios; track comentario._id) {
+        @for (comentario of comentarios; track comentario._localId) {
           <div class="comentario">
             <div class="comentario-header">
               <img [src]="comentario.userPhoto || '/assets/default-avatar.png'" class="avatar-pequeno" alt="Avatar">
@@ -66,7 +66,7 @@
                   rows="3">
                 </textarea>
                 <div class="botones-edicion">
-                  <button class="btn-guardar" (click)="guardarEdicion(publicacion._id, comentario._id)">Guardar</button>
+                  <button class="btn-guardar" (click)="guardarEdicion(publicacion._id || publicacion.id, comentario._id || comentario.id)">Guardar</button>
                   <button class="btn-cancelar" (click)="cancelarEdicion()">Cancelar</button>
                 </div>
               </div>

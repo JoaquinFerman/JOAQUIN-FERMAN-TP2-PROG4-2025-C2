@@ -105,7 +105,13 @@ export class PublicacionComponent {
     this.postsService.addComment(this.data._id, comment).subscribe({
       next: (post) => {
         console.log('Comentario agregado exitosamente:', post);
-        this.data.comments = post.comments;
+        console.log('Estructura del primer comentario:', post.comments?.[0]);
+        // Normalizar _ownerId y asegurar _id en cada comentario recibido
+        this.data.comments = (post.comments || []).map((c: any, idx: number) => ({
+          ...c,
+          _id: c._id || c.id || `temp-${Date.now()}-${idx}`,
+          _ownerId: c.userId || c.user?._id || c.user || c.userIdStr || c.ownerId || c.authorId || null
+        }));
       },
       error: (err) => {
         console.error('Error al agregar comentario:', err);

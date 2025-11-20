@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 import { AuthService } from '../services/auth';
+import { PostsService } from '../services/posts.service';
 import { NotificationService } from '../services/notification.service';
 import { API_BASE } from '../config';
 
@@ -26,7 +27,8 @@ export class MiPerfilComponent {
   constructor(
     private http: HttpClient, 
     private authService: AuthService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private postsService: PostsService
   ) {}
 
   editar() {
@@ -164,12 +166,93 @@ export class MiPerfilComponent {
 
   publicacionExpandida: any = null;
 
+  // Comentarios: edición inline
+  editingCommentId: string | null = null;
+  editingContent: string = '';
+
   verPublicacion(publicacionId: string) {
     // Encontrar y mostrar la publicación en modal
     const publicacion = this.misPublicaciones.find(p => (p._id || p.id) === publicacionId);
     if (publicacion) {
       this.publicacionExpandida = publicacion;
     }
+  }
+
+  // Inicia la edición de un comentario (solo si es del usuario actual)
+  startEditComment(comment: any) {
+    const me = this.authService.getUserProfile();
+    const myId = me?.id || me?._id;
+    const ownerId = comment.userId || comment.user || comment.userIdStr || comment.user._id || comment.userId;
+    if (!myId || String(ownerId) !== String(myId)) return;
+
+    this.editingCommentId = comment._id || comment.id;
+    // Mostrar el contenido sin el sufijo [editado] si ya existe
+    this.editingContent = (comment.content || '').replace(/\s*\[editado\]\s*$/i, '');
+  }
+
+  cancelEditComment() {
+    this.editingCommentId = null;
+    this.editingContent = '';
+  }
+
+  saveEditComment(comment: any) {
+    if (!this.editingCommentId) return;
+    const newContent = (this.editingContent || '').trim();
+    if (!newContent) {
+      this.notificationService.error('El comentario no puede quedar vacío');
+      return;
+    }
+
+    const postId = this.publicacionExpandida._id || this.publicacionExpandida.id;
+    const commentId = comment._id || comment.id;
+
+    this.postsService.editComment(postId, commentId, newContent).subscribe({
+      next: (resp) => {
+        // Actualizar el comment en la UI: agregar indicador [editado] y marcar como modificado
+        comment.content = newContent + ' [editado]';
+        comment.edited = true;
+        comment.modified = true;
+        comment.modifiedAt = new Date();
+        this.notificationService.success('Comentario editado');
+        this.cancelEditComment();
+      },
+      error: (err) => {
+        console.error('Error editando comentario:', err);
+        this.notificationService.error('No se pudo editar el comentario');
+      }
+    });
+  }
+
+  get currentUserId() {
+    const me = this.authService.getUserProfile();
+    return me?.id || me?._id || null;
+  }
+
+  isCommentEdited(comment: any): boolean {
+    if (!comment) return false;
+    if (comment.edited) return true;
+    const content = comment.content || '';
+    return /\[editado\]\s*$/i.test(content);
+  }
+
+  isCommentOwner(comment: any): boolean {
+    // Allow admins to manage comments
+    try { if (this.authService.isAdmin && this.authService.isAdmin()) return true; } catch (e) {}
+
+    const me = this.authService.getUserProfile();
+    const myId = me?.id || me?._id || null;
+    const myUserName = me?.nombreUsuario || me?.username || null;
+    
+    // Try ID comparison first
+    const owner = comment?._ownerId || comment?.userId || comment?.user?._id || comment?.user || comment?.userIdStr || comment?.ownerId || comment?.authorId;
+    if (myId && owner && String(owner) === String(myId)) return true;
+    
+    // Fallback: compare userName
+    if (myUserName && comment?.userName) {
+      return String(comment.userName) === String(myUserName);
+    }
+    
+    return false;
   }
 
   cerrarPublicacionExpandida() {

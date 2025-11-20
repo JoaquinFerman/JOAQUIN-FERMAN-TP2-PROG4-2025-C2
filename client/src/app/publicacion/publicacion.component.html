@@ -33,9 +33,9 @@
       }
       <span>{{data.likesCount}} me gusta</span>
     </div>
-    <div class="comentarios" (click)="$event.stopPropagation()">
+      <div class="comentarios" (click)="$event.stopPropagation()">
       @for (comment of data.comments; track comment) {
-        <app-comentario [data]="comment"></app-comentario>
+        <app-comentario [data]="comment" [postId]="data._id || data.id"></app-comentario>
       }
       <form (submit)="onAddComment($event, commentInput)">
         <input #commentInput type="text" name="content" placeholder="Agregar comentario..." required>
@@ -46,8 +46,7 @@
       <img *ngIf="data.imageUrl" [src]="data.imageUrl" alt="Imagen de la publicación">
       <div class="comentarios">
         <div *ngFor="let comentario of data.comments">
-          <p>{{comentario.content}}</p>
-          <small *ngIf="comentario.modified">(Editado)</small>
+          <app-comentario [data]="comentario" [postId]="data._id || data.id"></app-comentario>
         </div>
         <button (click)="cargarMasComentarios()">Cargar más</button>
       </div>
