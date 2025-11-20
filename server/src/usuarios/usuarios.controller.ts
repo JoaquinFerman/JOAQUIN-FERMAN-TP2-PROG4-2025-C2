@@ -19,9 +19,14 @@ export class UsuariosController {
   // Endpoint para que admin cree nuevos usuarios
   @Post('admin/crear')
   @UseGuards(JwtAuthGuard, AdminGuard)
-  @UsePipes(LowercasePipe)
   createByAdmin(@Body() createUsuarioDto: CreateUsuarioDto) {
-    return this.usuariosService.create(createUsuarioDto);
+    // Aplicar lowercase solo a email y nombreUsuario, NO a password
+    const processedDto = {
+      ...createUsuarioDto,
+      email: createUsuarioDto.email?.toLowerCase(),
+      nombreUsuario: createUsuarioDto.nombreUsuario?.toLowerCase()
+    };
+    return this.usuariosService.create(processedDto);
   }
 
   // Listar todos los usuarios (solo admin)
