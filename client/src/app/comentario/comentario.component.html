@@ -14,7 +14,7 @@
       </div>
     </div>
   } @else {
-    <p class="contenido">{{data.content}} @if (isCommentEdited()) {<span class="editado-indicador"> [editado]</span>} </p>
+    <p class="contenido">{{data.content}}<span *ngIf="isCommentEdited()" class="editado-indicador"> [editado]</span></p>
     <!-- Mostrar editar si es propio -->
     @if (isMyComment()) {
       <div class="acciones-comentario">
