@@ -205,13 +205,13 @@ export class PublicacionesController {
     @Body() body: { content: string },
   ) {
     const user = req.user || {};
-    const userId = user.sub || user.id || user._id;
+    const userName = user.nombreUsuario || user.username;
     
     if (!body || typeof body.content !== 'string' || !body.content.trim()) {
       throw new BadRequestException('El contenido del comentario es requerido');
     }
 
-    return this.publicacionesService.editComment(postId, commentId, userId, body.content.trim());
+    return this.publicacionesService.editComment(postId, commentId, userName, body.content.trim());
   }
 }
 

@@ -241,19 +241,17 @@ export class PublicacionesService {
     };
   }
 
-  async editComment(postId: string, commentId: string, userId: string, newContent: string) {
-    this.logger.log(`Editando comentario ${commentId} del post ${postId} por usuario ${userId}`);
+  async editComment(postId: string, commentId: string, userName: string, newContent: string) {
+    this.logger.log(`Editando comentario ${commentId} del post ${postId} por usuario ${userName}`);
     const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
     
     const comment = post.comments.find((c: any) => c._id && c._id.toString() === commentId);
     if (!comment) throw new NotFoundException('Comentario no encontrado');
     
-    // Verificar que el usuario sea el autor del comentario
-    // Comparar por userName ya que los comentarios no tienen userId
     const commentAny = comment as any;
-    if (commentAny.userName !== userId) {
-      this.logger.warn(`Usuario ${userId} intentó editar comentario de ${commentAny.userName}`);
+    if (commentAny.userName !== userName) {
+      this.logger.warn(`Usuario ${userName} intentó editar comentario de ${commentAny.userName}`);
       throw new ForbiddenException('Solo el autor del comentario puede editarlo');
     }
     
