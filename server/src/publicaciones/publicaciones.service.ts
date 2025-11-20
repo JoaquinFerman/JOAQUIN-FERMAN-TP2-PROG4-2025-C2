@@ -246,16 +246,8 @@ export class PublicacionesService {
     const post = await this.publicacioneModel.findOne({ _id: postId, deleted: { $ne: true } }).exec();
     if (!post) throw new NotFoundException('Publicación no encontrada');
     
-    this.logger.log(`Post encontrado con ${post.comments.length} comentarios`);
-    post.comments.forEach((c: any, idx) => {
-      this.logger.log(`Comentario ${idx}: _id=${c._id}, userName=${c.userName}`);
-    });
-    
     const comment = post.comments.find((c: any) => c._id && c._id.toString() === commentId);
-    if (!comment) {
-      this.logger.error(`Comentario ${commentId} NO encontrado en post ${postId}`);
-      throw new NotFoundException('Comentario no encontrado');
-    }
+    if (!comment) throw new NotFoundException('Comentario no encontrado');
     
     // Verificar que el usuario sea el autor del comentario
     // Comparar por userName ya que los comentarios no tienen userId
