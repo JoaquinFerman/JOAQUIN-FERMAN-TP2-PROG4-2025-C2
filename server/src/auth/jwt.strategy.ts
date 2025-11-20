@@ -67,6 +67,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         name: u.name || u.nombre || u.nombreUsuario,
         email: u.email,
         imagenPerfil: u.imagenPerfil || u.userPhoto || null,
+        perfil: u.perfil || (payload as any)?.perfil || 'usuario',
         // include any other useful fields without mongoose prototypes
         roles: u.roles || [],
       };
